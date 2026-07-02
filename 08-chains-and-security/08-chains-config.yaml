@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chains-config
+  namespace: tekton-chains
+data:
+  # Where to store the signed attestations.
+  # "oci" attaches them as OCI referrers alongside the image (recommended).
+  artifacts.oci.storage: "oci"
+  artifacts.taskrun.storage: "oci"
+  artifacts.pipelinerun.storage: "oci"
+
+  # Signing format for OCI images.
+  # artifacts.oci.format ONLY accepts "simplesigning" — it is an image signing
+  # format, not an attestation format. "slsa/v1" is invalid here and will crash
+  # the Chains controller on startup.
+  artifacts.oci.format: "simplesigning"
+
+  # Attestation format for TaskRun and PipelineRun provenance documents.
+  # "in-toto" is supported across all current Chains versions.
+  # "slsa/v1" requires Chains v0.21+ — use "in-toto" for broad compatibility.
+  artifacts.taskrun.format: "in-toto"
+  artifacts.pipelinerun.format: "in-toto"
+
+  # Transparency log — set to false for local/air-gapped dev clusters.
+  # Set to true in production to publish to the Sigstore Rekor public log.
+  transparency.enabled: "false"
+  transparency.url: "https://rekor.sigstore.dev"

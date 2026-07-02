@@ -1,0 +1,77 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: code-quality-pipeline
+  annotations:
+    tekton.dev/displayName: "Code Quality Pipeline"
+    tekton.dev/description: "Validates repo, runs lint + test in parallel, reports results"
+spec:
+  description: "Demonstrates task chaining, parallel execution, and result passing"
+  params:
+    - name: repo-url
+      type: string
+      description: "Full URL of the Git repository to check"
+      default: "https://github.com/tektoncd/pipeline"
+    - name: revision
+      type: string
+      default: "main"
+  # Pipeline surfaces a result from one of its tasks to callers
+  results:
+    - name: quality-summary
+      description: "Final quality report from the pipeline run"
+      value: "$(tasks.generate-report.results.summary)"
+
+  tasks:
+    # STEP 1 — Validate input (runs first, blocks everything else)
+    - name: validate
+      taskRef:
+        name: validate-repo
+      params:
+        - name: repo-url
+          value: "$(params.repo-url)"
+
+    # STEP 2a — Lint (runs in parallel with test, after validate)
+    - name: lint
+      runAfter:
+        - validate
+      taskRef:
+        name: run-check
+      params:
+        - name: check-type
+          value: "lint"
+        - name: repo-name
+          # Reference the result from the validate task
+          value: "$(tasks.validate.results.repo-name)"
+
+    # STEP 2b — Test (runs in parallel with lint, after validate)
+    - name: test
+      runAfter:
+        - validate
+      taskRef:
+        name: run-check
+      params:
+        - name: check-type
+          value: "test"
+        - name: repo-name
+          value: "$(tasks.validate.results.repo-name)"
+
+    # STEP 3 — Report (runs after BOTH lint and test complete)
+    - name: generate-report
+      runAfter:
+        - lint
+        - test
+      taskRef:
+        name: quality-report
+      params:
+        - name: repo-name
+          value: "$(tasks.validate.results.repo-name)"
+        - name: repo-host
+          value: "$(tasks.validate.results.repo-host)"
+        - name: lint-status
+          value: "$(tasks.lint.results.status)"
+        - name: lint-findings
+          value: "$(tasks.lint.results.finding-count)"
+        - name: test-status
+          value: "$(tasks.test.results.status)"
+        - name: test-findings
+          value: "$(tasks.test.results.finding-count)"

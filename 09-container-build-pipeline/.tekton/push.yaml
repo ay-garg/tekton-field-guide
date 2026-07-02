@@ -1,0 +1,42 @@
+# Store this file at .tekton/push.yaml in your application repository.
+# Tekton PaC (Pipeline as Code) detects it and runs it on every push.
+#
+# Annotations control WHEN this pipeline runs:
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: push-build
+  annotations:
+    # PaC annotation: trigger on push to main
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-target-branch: "[main, release-*]"
+    # Maximum number of concurrent runs for this pipeline
+    pipelinesascode.tekton.dev/max-keep-runs: "5"
+spec:
+  pipelineRef:
+    name: production-container-pipeline
+  params:
+    - name: git-url
+      value: "{{ repo_url }}"          # PaC template variable
+    - name: git-revision
+      value: "{{ revision }}"          # PaC template variable
+    - name: image-name
+      value: "quay.io/myorg/myapp"
+    - name: dockerfile-path
+      value: "./Containerfile"
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 1Gi
+    - name: registry-auth
+      secret:
+        secretName: registry-push-credentials
+    # Uncomment for private repositories — provide a Secret with
+    # .git-credentials or SSH keys for PaC to authenticate to git.
+    # - name: git-auth
+    #   secret:
+    #     secretName: pipelines-as-code-secret

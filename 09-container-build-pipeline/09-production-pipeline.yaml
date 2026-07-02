@@ -1,0 +1,284 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: production-container-pipeline
+  annotations:
+    tekton.dev/displayName: "Production Container CI Pipeline"
+    tekton.dev/description: |
+      Full CI pipeline: clone, test, build, scan, sign.
+      Mirrors the structure of Konflux's default build pipeline.
+spec:
+  params:
+    - name: git-url
+      type: string
+      description: "Repository URL"
+    - name: git-revision
+      type: string
+      default: "main"
+    - name: image-name
+      type: string
+      description: "Target image, e.g. quay.io/myorg/myapp"
+    - name: dockerfile-path
+      type: string
+      default: "./Containerfile"
+    - name: skip-tests
+      type: string
+      default: "false"
+    - name: skip-vuln-scan
+      type: string
+      default: "false"
+
+  results:
+    - name: image-url
+      value: "$(tasks.build-container.results.IMAGE_URL)"
+    - name: image-digest
+      value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - name: git-commit
+      value: "$(tasks.clone-repository.results.commit)"
+
+  workspaces:
+    - name: source
+      description: "Shared workspace — source code and build artifacts"
+    - name: registry-auth
+      description: "Container registry credentials (docker config secret)"
+    # Uncomment for private repositories — mount a Secret with .git-credentials
+    # or SSH keys so git-clone can authenticate.
+    # - name: git-auth
+    #   description: "Git credentials for private repos (optional)"
+    #   optional: true
+
+  tasks:
+    # ── Stage 1: Clone ─────────────────────────────────────────────
+    - name: clone-repository
+      taskRef:
+        resolver: http
+        params:
+          - name: url
+            value: https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.9/git-clone.yaml
+      params:
+        - name: url
+          value: "$(params.git-url)"
+        - name: revision
+          value: "$(params.git-revision)"
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: source
+        # Uncomment for private repositories — maps the pipeline's git-auth
+        # workspace slot to the git-clone task's basic-auth workspace.
+        # - name: basic-auth
+        #   workspace: git-auth
+
+    # ── Stage 2: Test (skippable) ──────────────────────────────────
+    - name: run-unit-tests
+      runAfter:
+        - clone-repository
+      when:
+        - input: "$(params.skip-tests)"
+          operator: in
+          values: ["false", ""]
+      taskSpec:
+        workspaces:
+          - name: source
+        params:
+          - name: commit
+            type: string
+        steps:
+          - name: test
+            image: golang:1.24-alpine
+            workingDir: "$(workspaces.source.path)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "Running unit tests at commit: $(params.commit)"
+              # Detect project type
+              if [ -f go.mod ]; then
+                go test ./... -v -count=1
+              elif [ -f package.json ]; then
+                npm test
+              elif [ -f requirements.txt ]; then
+                pip install -r requirements.txt
+                python -m pytest
+              else
+                echo "No recognized test runner — skipping"
+              fi
+      params:
+        - name: commit
+          value: "$(tasks.clone-repository.results.commit)"
+      workspaces:
+        - name: source
+          workspace: source
+
+    # ── Stage 3: Build Container Image ────────────────────────────
+    - name: build-container
+      runAfter:
+        - run-unit-tests
+      taskSpec:
+        params:
+          - name: image
+            type: string
+          - name: dockerfile
+            type: string
+          - name: commit
+            type: string
+        results:
+          - name: IMAGE_URL
+            description: "Full image URL with tag"
+          - name: IMAGE_DIGEST
+            description: "SHA256 digest of pushed image"
+        workspaces:
+          - name: source
+          - name: registry-auth
+        steps:
+          - name: build-and-push
+            image: quay.io/buildah/stable:latest
+            securityContext:
+              privileged: true
+            env:
+              - name: IMAGE
+                value: "$(params.image):$(params.commit)"
+              - name: DOCKERFILE
+                value: "$(params.dockerfile)"
+              - name: DOCKERCONFIG
+                value: "$(workspaces.registry-auth.path)/config.json"
+            workingDir: "$(workspaces.source.path)"
+            script: |
+              #!/bin/bash
+              set -euo pipefail
+              export REGISTRY_AUTH_FILE="$DOCKERCONFIG"
+
+              echo "Building image: $IMAGE"
+              buildah build \
+                --file "$DOCKERFILE" \
+                --format oci \
+                --tag "$IMAGE" \
+                .
+
+              echo "Pushing image to registry..."
+              buildah push \
+                --digestfile /tmp/image-digest \
+                "$IMAGE"
+
+              DIGEST=$(cat /tmp/image-digest)
+              echo "Image pushed successfully"
+              echo "URL:    $IMAGE"
+              echo "Digest: $DIGEST"
+
+              printf '%s' "$IMAGE"  | tee "$(results.IMAGE_URL.path)"
+              printf '%s' "$DIGEST" | tee "$(results.IMAGE_DIGEST.path)"
+      params:
+        - name: image
+          value: "$(params.image-name)"
+        - name: dockerfile
+          value: "$(params.dockerfile-path)"
+        - name: commit
+          value: "$(tasks.clone-repository.results.commit)"
+      workspaces:
+        - name: source
+          workspace: source
+        - name: registry-auth
+          workspace: registry-auth
+
+    # ── Stage 4a: Vulnerability Scan (skippable) ──────────────────
+    - name: vulnerability-scan
+      runAfter:
+        - build-container
+      when:
+        - input: "$(params.skip-vuln-scan)"
+          operator: in
+          values: ["false", ""]
+      taskSpec:
+        params:
+          - name: image-url
+          - name: image-digest
+        steps:
+          - name: trivy-scan
+            image: aquasec/trivy:latest
+            env:
+              - name: TRIVY_NO_PROGRESS
+                value: "true"
+              - name: TRIVY_EXIT_CODE
+                value: "1"
+              - name: TRIVY_SEVERITY
+                value: "CRITICAL"
+            script: |
+              #!/bin/sh
+              IMAGE="$(params.image-url)@$(params.image-digest)"
+              echo "Scanning image: $IMAGE"
+              trivy image \
+                --exit-code "$TRIVY_EXIT_CODE" \
+                --severity "$TRIVY_SEVERITY" \
+                --format table \
+                "$IMAGE"
+      params:
+        - name: image-url
+          value: "$(tasks.build-container.results.IMAGE_URL)"
+        - name: image-digest
+          value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+
+    # ── Stage 4b: Generate SBOM ────────────────────────────────────
+    - name: generate-sbom
+      runAfter:
+        - build-container
+      taskSpec:
+        params:
+          - name: image-url
+          - name: image-digest
+        workspaces:
+          - name: source
+        steps:
+          - name: syft-sbom
+            # anchore/syft:latest is distroless — no shell, so Tekton cannot
+            # inject its script file. Use alpine and install the syft binary.
+            image: alpine:3.18
+            env:
+              - name: IMAGE
+                value: "$(params.image-url)@$(params.image-digest)"
+            workingDir: "$(workspaces.source.path)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "Installing syft..."
+              apk add --no-cache curl ca-certificates
+              curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
+                | sh -s -- -b /usr/local/bin
+              echo "Generating SBOM for: $IMAGE"
+              syft "$IMAGE" -o cyclonedx-json > sbom.json
+              echo "SBOM generated: $(wc -l < sbom.json) lines"
+              echo "Top components:"
+              head -50 sbom.json
+      params:
+        - name: image-url
+          value: "$(tasks.build-container.results.IMAGE_URL)"
+        - name: image-digest
+          value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      workspaces:
+        - name: source
+          workspace: source
+
+  # ── Finally: Always runs ─────────────────────────────────────────
+  finally:
+    - name: pipeline-notification
+      taskSpec:
+        params:
+          - name: image-url
+            default: "unknown"
+          - name: run-name
+        steps:
+          - name: notify
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "========================================"
+              echo " Pipeline Complete"
+              echo " Run:   $(params.run-name)"
+              echo " Image: $(params.image-url)"
+              echo " Time:  $(date -u)"
+              echo "========================================"
+              # In production: curl -X POST SLACK_WEBHOOK -d "{...}"
+      params:
+        - name: run-name
+          value: "$(context.pipelineRun.name)"
+        - name: image-url
+          value: "$(tasks.build-container.results.IMAGE_URL)"

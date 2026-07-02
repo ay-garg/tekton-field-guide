@@ -1,0 +1,53 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: hello-world
+  labels:
+    app.kubernetes.io/version: "1.0"
+  annotations:
+    tekton.dev/displayName: "Hello World"
+    tekton.dev/description: "A simple hello world to demonstrate Task structure"
+spec:
+  description: "Greets a user and shows basic Tekton Task concepts"
+  params:
+    - name: name
+      type: string
+      default: "Tekton Learner"
+      description: "The name of the person to greet"
+    - name: language
+      type: string
+      default: "english"
+      description: "Greeting language: english, spanish, french"
+  results:
+    - name: greeting
+      description: "The full greeting message that was printed"
+  steps:
+    - name: greet
+      image: alpine:3.18
+      env:
+        - name: GREETING_NAME
+          value: "$(params.name)"
+        - name: LANG_CHOICE
+          value: "$(params.language)"
+      script: |
+        #!/bin/sh
+        set -e
+        case "$LANG_CHOICE" in
+          spanish) MSG="¡Hola, $GREETING_NAME! Bienvenido a Tekton." ;;
+          french)  MSG="Bonjour, $GREETING_NAME! Bienvenue sur Tekton." ;;
+          *)       MSG="Hello, $GREETING_NAME! Welcome to Tekton." ;;
+        esac
+        echo "$MSG"
+        # Write the greeting as a Task Result
+        printf '%s' "$MSG" | tee "$(results.greeting.path)"
+    - name: show-tekton-facts
+      image: alpine:3.18
+      script: |
+        #!/bin/sh
+        echo ""
+        echo "=== About This Execution ==="
+        echo "This step runs AFTER the greet step in the SAME Pod."
+        echo "Hostname (Pod name): $(hostname)"
+        echo "Date: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+        echo "Tekton injects metadata via the downward API."
+        echo "Each Step is a separate container init that runs sequentially."

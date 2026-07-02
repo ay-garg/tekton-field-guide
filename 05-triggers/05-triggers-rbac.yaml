@@ -1,0 +1,78 @@
+---
+# ServiceAccount used by the EventListener Pod
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-sa
+  namespace: default
+---
+# Role granting the SA permission to create pipeline resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tekton-triggers-role
+  namespace: default
+rules:
+  # Allow creating PipelineRuns
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelineruns", "taskruns"]
+    verbs: ["create", "get", "list", "watch"]
+  # Allow reading existing Pipelines and Tasks
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelines", "tasks"]
+    verbs: ["get", "list"]
+  # Allow creating PVCs for workspaces
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["create", "delete", "get", "list"]
+  # Allow reading Secrets (for webhook secret validation)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-triggers-rolebinding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-sa
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-triggers-role
+---
+# ClusterRole granting access to cluster-scoped Triggers resources.
+# ClusterInterceptors live at the cluster scope so a Role (namespace-only)
+# cannot grant access to them — a ClusterRole is required.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tekton-triggers-eventlistener-clusterrole
+rules:
+  - apiGroups: ["triggers.tekton.dev"]
+    resources:
+      - clusterinterceptors       # cluster-scoped — the key missing permission
+      - clustertriggerbindings
+      - eventlisteners
+      - triggerbindings
+      - triggertemplates
+      - triggers
+      - interceptors
+    verbs: ["get", "list", "watch"]
+---
+# Bind the EventListener SA to the ClusterRole above
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tekton-triggers-cluster-binding
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-sa
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-clusterrole

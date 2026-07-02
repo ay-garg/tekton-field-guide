@@ -1,0 +1,75 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-info
+  annotations:
+    tekton.dev/displayName: "Build Info Collector"
+spec:
+  description: "Collects build metadata and surfaces it as Task Results for downstream tasks"
+  params:
+    - name: image-name
+      type: string
+      description: "The name of the image being built (e.g. myapp)"
+    - name: git-revision
+      type: string
+      default: "main"
+      description: "Git revision being built"
+    - name: registry
+      type: string
+      default: "quay.io/myorg"
+      description: "Target container registry"
+  results:
+    - name: image-url
+      description: "Full image URL including registry and name"
+    - name: build-timestamp
+      description: "Unix timestamp when the build started"
+    - name: image-tag
+      description: "The tag that will be applied to the image"
+  # stepTemplate applies these fields to ALL steps — avoids repetition
+  stepTemplate:
+    image: alpine:3.18
+    env:
+      - name: IMAGE_NAME
+        value: "$(params.image-name)"
+      - name: GIT_REVISION
+        value: "$(params.git-revision)"
+      - name: REGISTRY
+        value: "$(params.registry)"
+  steps:
+    - name: compute-tag
+      script: |
+        #!/bin/sh
+        set -e
+        # In real pipelines this comes from git describe or the commit SHA
+        TAG="$(date -u '+%Y%m%d')-${GIT_REVISION}"
+        echo "Computed image tag: $TAG"
+        printf '%s' "$TAG" | tee "$(results.image-tag.path)"
+
+    - name: compute-image-url
+      script: |
+        #!/bin/sh
+        set -e
+        TAG=$(cat "$(results.image-tag.path)")
+        IMAGE_URL="${REGISTRY}/${IMAGE_NAME}:${TAG}"
+        echo "Full image URL: $IMAGE_URL"
+        printf '%s' "$IMAGE_URL" | tee "$(results.image-url.path)"
+
+    - name: record-timestamp
+      script: |
+        #!/bin/sh
+        set -e
+        TS=$(date -u '+%s')
+        echo "Build timestamp: $TS"
+        printf '%s' "$TS" | tee "$(results.build-timestamp.path)"
+
+    - name: print-summary
+      script: |
+        #!/bin/sh
+        echo ""
+        echo "=== Build Info Summary ==="
+        echo "Image:     $(cat $(results.image-url.path))"
+        echo "Tag:       $(cat $(results.image-tag.path))"
+        echo "Timestamp: $(cat $(results.build-timestamp.path))"
+        echo ""
+        echo "These results are now available to any downstream Task"
+        echo "in a Pipeline via: \$(tasks.build-info.results.image-url)"

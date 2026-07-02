@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: simulate-build-and-push
+  annotations:
+    # Tell Chains which results contain the image coordinates
+    chains.tekton.dev/output-image-name: IMAGE_URL
+    chains.tekton.dev/output-image-digest: IMAGE_DIGEST
+spec:
+  description: |
+    Simulates building and pushing a container image.
+    In a real pipeline this would be the Buildah task.
+    Chains watches for the IMAGE_URL and IMAGE_DIGEST results.
+  params:
+    - name: image-name
+      type: string
+      description: "Full image reference including tag (e.g. quay.io/org/app:v1.0)"
+  results:
+    # Chains REQUIRES these specific result names to detect the image
+    - name: IMAGE_URL
+      description: "The full URL of the built image"
+    - name: IMAGE_DIGEST
+      description: "The SHA256 digest of the pushed image (sha256:...)"
+  steps:
+    - name: build-and-push
+      image: alpine:3.18
+      env:
+        - name: IMAGE
+          value: "$(params.image-name)"
+      script: |
+        #!/bin/sh
+        set -e
+        echo "=== Simulating Build & Push ==="
+        echo "Image: $IMAGE"
+        echo "Simulating Buildah build..."
+        sleep 2
+
+        # In a real scenario, the registry returns this digest after push
+        # Here we simulate a plausible digest
+        DIGEST="sha256:$(echo $IMAGE | md5sum | head -c 64)"
+
+        echo "Image built and pushed successfully!"
+        echo "Image URL:    $IMAGE"
+        echo "Image Digest: $DIGEST"
+
+        # Write results — Chains reads these after the TaskRun completes
+        printf '%s' "$IMAGE"  | tee "$(results.IMAGE_URL.path)"
+        printf '%s' "$DIGEST" | tee "$(results.IMAGE_DIGEST.path)"

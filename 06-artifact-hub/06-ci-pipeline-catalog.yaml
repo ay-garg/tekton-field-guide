@@ -1,0 +1,87 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: container-ci-pipeline
+  annotations:
+    tekton.dev/displayName: "Container CI Pipeline"
+    tekton.dev/description: "Clone, build, and push a container image using catalog tasks"
+spec:
+  params:
+    - name: git-url
+      type: string
+      description: "Repository URL to clone and build"
+    - name: git-revision
+      type: string
+      default: ""   # empty = HEAD of default branch (works for main, master, etc.)
+    - name: image-name
+      type: string
+      description: "Target image (e.g. quay.io/myorg/myapp)"
+    - name: dockerfile-path
+      type: string
+      default: "./Dockerfile"
+      description: "Path to the Dockerfile relative to repo root"
+    - name: context-path
+      type: string
+      default: "."
+      description: "Build context path"
+  results:
+    - name: image-url
+      description: "Full URL of the pushed image"
+      value: "$(tasks.build-image.results.IMAGE_URL)"
+    - name: image-digest
+      description: "SHA256 digest of the pushed image"
+      value: "$(tasks.build-image.results.IMAGE_DIGEST)"
+    - name: git-commit
+      description: "Exact commit SHA that was built"
+      value: "$(tasks.clone-repo.results.commit)"
+  workspaces:
+    - name: source
+      description: "Shared workspace: source code lives here"
+    - name: registry-auth
+      description: "Docker config secret for registry authentication"
+  tasks:
+    # TASK 1: Clone the repository
+    - name: clone-repo
+      taskRef:
+        # Use the resolver to reference the catalog task directly
+        # No kubectl apply needed — Tekton fetches it from the catalog
+        resolver: http
+        params:
+          - name: url
+            value: https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.9/git-clone.yaml
+      params:
+        - name: url
+          value: "$(params.git-url)"
+        - name: revision
+          value: "$(params.git-revision)"
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: source
+
+    # TASK 2: Build and push the container image with Buildah
+    - name: build-image
+      runAfter:
+        - clone-repo
+      taskRef:
+        resolver: http
+        params:
+          - name: url
+            value: https://raw.githubusercontent.com/tektoncd/catalog/main/task/buildah/0.7/buildah.yaml
+      params:
+        - name: IMAGE
+          value: "$(params.image-name):$(tasks.clone-repo.results.commit)"
+        - name: DOCKERFILE
+          value: "$(params.dockerfile-path)"
+        - name: CONTEXT
+          value: "$(params.context-path)"
+        - name: TLSVERIFY
+          value: "false"
+        - name: FORMAT
+          value: "oci"
+      workspaces:
+        - name: source
+          workspace: source
+        - name: dockerconfig
+          workspace: registry-auth

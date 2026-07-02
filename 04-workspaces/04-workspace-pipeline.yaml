@@ -1,0 +1,162 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: workspace-demo-pipeline
+spec:
+  description: "Demonstrates workspace usage: PVC for source, ConfigMap for config, Secret for creds"
+  params:
+    - name: app-name
+      type: string
+      default: "my-app"
+  # Pipeline-level workspace declarations — these are the slots
+  workspaces:
+    - name: source
+      description: "Shared PVC workspace for source files — all tasks share this"
+    - name: build-config
+      description: "ConfigMap workspace with build configuration (read-only)"
+    - name: registry-credentials
+      description: "Secret workspace with container registry credentials"
+      optional: true
+
+  tasks:
+    # Task 1: Write simulated source files to the shared workspace
+    - name: write-source
+      workspaces:
+        - name: source         # task's workspace name
+          workspace: source    # pipeline's workspace slot name
+        - name: config
+          workspace: build-config
+      taskSpec:
+        workspaces:
+          - name: source
+            description: "Where to write source files"
+          - name: config
+            description: "Build configuration (read-only)"
+        params:
+          - name: app-name
+            type: string
+        steps:
+          - name: create-source
+            image: alpine:3.18
+            env:
+              - name: APP
+                value: "$(params.app-name)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "Writing source to: $(workspaces.source.path)"
+              mkdir -p "$(workspaces.source.path)/src"
+              mkdir -p "$(workspaces.source.path)/tests"
+
+              # Simulate writing application code
+              cat > "$(workspaces.source.path)/src/main.go" << 'EOF'
+              package main
+
+              import "fmt"
+
+              func main() {
+                  fmt.Println("Hello from", "$(APP)")
+              }
+              EOF
+
+              cat > "$(workspaces.source.path)/Makefile" << 'EOF'
+              test:
+              	go test ./...
+              build:
+              	go build -o dist/$(APP) ./src
+              EOF
+
+              echo "Reading config from workspace..."
+              cat "$(workspaces.config.path)/config.yaml"
+              echo ""
+              echo "Source tree:"
+              find "$(workspaces.source.path)" -type f
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Task 2: Read source from workspace and 'build' it
+    - name: build
+      runAfter:
+        - write-source
+      workspaces:
+        - name: source
+          workspace: source
+        - name: config
+          workspace: build-config
+        - name: credentials
+          workspace: registry-credentials
+      taskSpec:
+        workspaces:
+          - name: source
+          - name: config
+          - name: credentials
+            optional: true
+        params:
+          - name: app-name
+            type: string
+        results:
+          - name: artifact-path
+            description: "Path to the built artifact in the workspace"
+        steps:
+          - name: build-app
+            image: alpine:3.18
+            env:
+              - name: APP
+                value: "$(params.app-name)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "=== Build Stage ==="
+              echo "Reading source from: $(workspaces.source.path)"
+              echo ""
+              echo "Source files found:"
+              find "$(workspaces.source.path)" -type f
+              echo ""
+              echo "Build config:"
+              cat "$(workspaces.config.path)/config.yaml"
+              echo ""
+
+              # Simulate building
+              mkdir -p "$(workspaces.source.path)/dist"
+              echo "#!/bin/sh" > "$(workspaces.source.path)/dist/$APP"
+              echo "echo 'I am $APP'" >> "$(workspaces.source.path)/dist/$APP"
+              chmod +x "$(workspaces.source.path)/dist/$APP"
+
+              ARTIFACT="$(workspaces.source.path)/dist/$APP"
+              echo "Built artifact: $ARTIFACT"
+              printf '%s' "$ARTIFACT" | tee "$(results.artifact-path.path)"
+              echo ""
+
+              # Check if credentials workspace was provided
+              if [ "$(workspaces.credentials.bound)" = "true" ]; then
+                echo "Registry credentials are available"
+                ls "$(workspaces.credentials.path)/"
+              else
+                echo "No registry credentials — skipping push (dry-run mode)"
+              fi
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Task 3: Verify the artifact exists in the workspace
+    - name: verify
+      runAfter:
+        - build
+      workspaces:
+        - name: source
+          workspace: source
+      taskSpec:
+        workspaces:
+          - name: source
+        steps:
+          - name: check-artifact
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "=== Verification ==="
+              echo "Checking workspace contents after build:"
+              find "$(workspaces.source.path)" -type f -exec ls -la {} +
+              echo ""
+              echo "All files persisted correctly across tasks!"
+              echo "This is the power of shared PVC workspaces."

@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: hello-world-run-001
+  labels:
+    # Labels make it easy to query related runs
+    task-name: hello-world
+    run-by: demo-video-2
+spec:
+  taskRef:
+    name: hello-world
+  params:
+    - name: name
+      value: "Konflux Engineer"
+    - name: language
+      value: "english"

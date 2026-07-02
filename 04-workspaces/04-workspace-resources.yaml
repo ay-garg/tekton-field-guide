@@ -1,0 +1,38 @@
+---
+# PersistentVolumeClaim — shared storage for Tasks in the pipeline
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pipeline-workspace-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  # On Minikube the default StorageClass provisions hostPath volumes
+  # On cloud clusters (EKS, GKE, OpenShift) use the cluster's default SC
+---
+# ConfigMap used as a read-only config workspace
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-config
+data:
+  config.yaml: |
+    version: "1.0"
+    build:
+      output_dir: /workspace/source/dist
+      optimization: true
+      target: linux/amd64
+    lint:
+      max_issues: 0
+      strict: true
+  .golangci.yml: |
+    run:
+      timeout: 5m
+    linters:
+      enable:
+        - errcheck
+        - gosimple
+        - staticcheck

@@ -1,0 +1,43 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: github-push-template
+spec:
+  # These params receive values from the TriggerBinding
+  params:
+    - name: git-repo-url
+      description: "URL of the repository that was pushed to"
+    - name: git-repo-name
+      description: "Short name of the repository"
+    - name: git-revision
+      description: "Commit SHA that was pushed"
+      default: "main"
+    - name: git-ref
+      description: "Git ref (branch or tag)"
+      default: "refs/heads/main"
+    - name: pusher-name
+      description: "GitHub username of who pushed"
+      default: "unknown"
+  resourcetemplates:
+    # This is the resource that gets created for each event
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        # generateName adds a random suffix for uniqueness
+        generateName: triggered-build-
+        labels:
+          triggers.tekton.dev/trigger: github-push
+          app.kubernetes.io/managed-by: tekton-triggers
+        annotations:
+          triggered-by: "$(tt.params.pusher-name)"
+          git-revision: "$(tt.params.git-revision)"
+      spec:
+        pipelineRef:
+          name: code-quality-pipeline
+        params:
+          - name: repo-url
+            value: "$(tt.params.git-repo-url)"
+          - name: revision
+            value: "$(tt.params.git-revision)"
+        # code-quality-pipeline (Video 3) has no workspace declarations,
+        # so no workspaces block is needed here.

@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: workspace-demo-run-001
+spec:
+  pipelineRef:
+    name: workspace-demo-pipeline
+  params:
+    - name: app-name
+      value: "myapp-v1"
+  # Bind the workspace slots to actual Kubernetes resources
+  workspaces:
+    - name: source
+      # Bind to our pre-created PVC
+      persistentVolumeClaim:
+        claimName: pipeline-workspace-pvc
+    - name: build-config
+      # Bind to our ConfigMap — mounted as files
+      configMap:
+        name: build-config
+    # NOTE: registry-credentials is optional, so omitting it is fine
+    # To include it you would add:
+    # - name: registry-credentials
+    #   secret:
+    #     secretName: registry-push-secret

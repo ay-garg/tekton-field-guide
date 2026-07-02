@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: advanced-run-skip-tests
+spec:
+  pipelineRef:
+    name: advanced-patterns-pipeline
+  params:
+    - name: app-name
+      value: "demo-app"
+    - name: skip-tests
+      # This will cause the run-tests task to be SKIPPED (not failed)
+      value: "true"
+    - name: run-security-scan
+      value: "true"
+    - name: platforms
+      value:
+        - "linux/amd64"
+        - "linux/arm64"
+  workspaces:
+    - name: source
+      emptyDir: {}

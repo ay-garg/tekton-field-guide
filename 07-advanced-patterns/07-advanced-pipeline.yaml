@@ -1,0 +1,169 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: advanced-patterns-pipeline
+spec:
+  params:
+    - name: skip-tests
+      type: string
+      default: "false"
+      description: "Set to 'true' to skip the test stage (use with caution)"
+    - name: run-security-scan
+      type: string
+      default: "true"
+      description: "Set to 'false' to skip security scanning"
+    - name: platforms
+      type: array
+      default:
+        - "linux/amd64"
+        - "linux/arm64"
+      description: "List of platforms to build for"
+    - name: app-name
+      type: string
+      default: "myapp"
+
+  workspaces:
+    - name: source
+
+  tasks:
+    # Always runs — validates configuration
+    - name: validate
+      taskSpec:
+        steps:
+          - name: check
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Validating pipeline configuration..."
+              echo "App: $(params.app-name)"
+              echo "Skip tests: $(params.skip-tests)"
+              echo "Validation passed."
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+        - name: skip-tests
+          value: "$(params.skip-tests)"
+
+    # Conditional: only runs if skip-tests != "true"
+    - name: run-tests
+      runAfter:
+        - validate
+      when:
+        - input: "$(params.skip-tests)"
+          operator: in
+          values: ["false", "False", "FALSE", ""]
+      taskSpec:
+        params:
+          - name: app-name
+        steps:
+          - name: test
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Running unit tests for $(params.app-name)..."
+              sleep 3
+              echo "42 tests passed, 0 failed."
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Matrix: builds for each platform in parallel
+    # One TaskRun is created per platform value
+    - name: build-multiarch
+      runAfter:
+        - validate
+      matrix:
+        params:
+          - name: platform
+            value:
+              - "$(params.platforms[0])"
+              - "$(params.platforms[1])"
+      taskSpec:
+        params:
+          - name: platform
+            type: string
+          - name: app-name
+            type: string
+        results:
+          - name: build-status
+        steps:
+          - name: build-for-platform
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              PLATFORM="$(params.platform)"
+              APP="$(params.app-name)"
+              echo "Building $APP for platform: $PLATFORM"
+              sleep 4
+              echo "Build complete for $PLATFORM"
+              printf '%s' "success-$PLATFORM" | tee "$(results.build-status.path)"
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Conditional: skip if run-security-scan is false
+    # Also uses retry — will retry up to 2 times on failure
+    - name: security-scan
+      runAfter:
+        - build-multiarch
+      when:
+        - input: "$(params.run-security-scan)"
+          operator: in
+          values: ["true", "True", "TRUE"]
+      retries: 2
+      timeout: "10m"
+      taskSpec:
+        params:
+          - name: app-name
+        steps:
+          - name: scan
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Running security scan on $(params.app-name)..."
+              sleep 2
+              echo "Scan complete. No critical vulnerabilities found."
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+  # FINALLY block — always executes, even if above tasks fail
+  finally:
+    - name: notify-result
+      taskSpec:
+        params:
+          - name: pipeline-run-name
+            type: string
+        steps:
+          - name: send-notification
+            image: alpine:3.18
+            env:
+              - name: PIPELINERUN_NAME
+                value: "$(params.pipeline-run-name)"
+            script: |
+              #!/bin/sh
+              echo "=== Pipeline Completion Notification ==="
+              echo "PipelineRun: $PIPELINERUN_NAME"
+              echo "Namespace: $(context.pipelineRun.namespace)"
+              echo ""
+              # In a real pipeline this would call a Slack webhook or
+              # post a GitHub status comment
+              echo "Status: Pipeline finished (check PipelineRun for final status)"
+              echo "Timestamp: $(date -u)"
+              echo "This finally task always runs, regardless of success or failure."
+      params:
+        - name: pipeline-run-name
+          value: "$(context.pipelineRun.name)"
+
+    # Cleanup: delete temporary resources
+    - name: cleanup-workspace
+      taskSpec:
+        steps:
+          - name: cleanup
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Cleaning up temporary files..."
+              echo "In a real pipeline: rm -rf /workspace/source/tmp"
+              echo "Or delete temporary PVCs, ConfigMaps, etc."
+              echo "Cleanup complete."

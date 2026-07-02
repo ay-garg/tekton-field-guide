@@ -1,0 +1,120 @@
+---
+# Task 1: Validates the repository URL and extracts the repo name
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: validate-repo
+spec:
+  description: "Validates a Git repository URL and extracts the project name"
+  params:
+    - name: repo-url
+      type: string
+  results:
+    - name: repo-name
+      description: "Short repository name extracted from the URL"
+    - name: repo-host
+      description: "The hosting service: github or gitlab"
+  steps:
+    - name: validate-and-extract
+      image: alpine:3.18
+      env:
+        - name: REPO_URL
+          value: "$(params.repo-url)"
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Validating: $REPO_URL"
+        if echo "$REPO_URL" | grep -q "github.com"; then
+          HOST="github"
+        elif echo "$REPO_URL" | grep -q "gitlab.com"; then
+          HOST="gitlab"
+        else
+          echo "ERROR: Unsupported host. Use github.com or gitlab.com"
+          exit 1
+        fi
+        REPO_NAME=$(echo "$REPO_URL" | sed 's|.*/||' | sed 's|\.git$||')
+        echo "Host: $HOST"
+        echo "Repo name: $REPO_NAME"
+        printf '%s' "$HOST"      | tee "$(results.repo-host.path)"
+        printf '%s' "$REPO_NAME" | tee "$(results.repo-name.path)"
+---
+# Task 2: Simulates a code check (used for both lint and test steps)
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: run-check
+spec:
+  description: "Simulates running a code quality check (lint or test)"
+  params:
+    - name: check-type
+      type: string
+      description: "Type of check: lint or test"
+    - name: repo-name
+      type: string
+  results:
+    - name: status
+      description: "Check result: pass or fail"
+    - name: finding-count
+      description: "Number of findings (0 = clean)"
+  steps:
+    - name: execute-check
+      image: alpine:3.18
+      env:
+        - name: CHECK_TYPE
+          value: "$(params.check-type)"
+        - name: REPO_NAME
+          value: "$(params.repo-name)"
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Running $CHECK_TYPE check for: $REPO_NAME"
+        echo "Simulating work..."
+        sleep 2
+        COUNT=0
+        echo "$CHECK_TYPE complete. Findings: $COUNT"
+        printf '%s' "pass"  | tee "$(results.status.path)"
+        printf '%s' "$COUNT" | tee "$(results.finding-count.path)"
+---
+# Task 3: Generates a summary report from all previous task results
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: quality-report
+spec:
+  description: "Generates a final quality report from lint and test results"
+  params:
+    - name: repo-name
+      type: string
+    - name: repo-host
+      type: string
+    - name: lint-status
+      type: string
+    - name: lint-findings
+      type: string
+    - name: test-status
+      type: string
+    - name: test-findings
+      type: string
+  results:
+    - name: summary
+      description: "One-line quality summary"
+  steps:
+    - name: generate
+      image: alpine:3.18
+      script: |
+        #!/bin/sh
+        REPO="$(params.repo-name)"
+        HOST="$(params.repo-host)"
+        LINT="$(params.lint-status) ($(params.lint-findings) issues)"
+        TEST="$(params.test-status) ($(params.test-findings) findings)"
+        SUMMARY="[$HOST] $REPO — Lint: $LINT | Tests: $TEST"
+        echo ""
+        echo "=========================================="
+        echo " QUALITY REPORT"
+        echo "=========================================="
+        echo " Repository : $REPO"
+        echo " Host       : $HOST"
+        echo " Lint       : $LINT"
+        echo " Tests      : $TEST"
+        echo "=========================================="
+        printf '%s' "$SUMMARY" | tee "$(results.summary.path)"

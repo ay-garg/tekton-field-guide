@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: quality-pipeline-run-001
+  labels:
+    pipeline-name: code-quality-pipeline
+spec:
+  pipelineRef:
+    name: code-quality-pipeline
+  params:
+    - name: repo-url
+      value: "https://github.com/tektoncd/pipeline"
+    - name: revision
+      value: "main"
+  # TaskRunSpecs lets you set compute limits per task
+  taskRunSpecs:
+    - pipelineTaskName: lint
+      computeResources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+    - pipelineTaskName: test
+      computeResources:
+        requests:
+          memory: "128Mi"
+          cpu: "200m"

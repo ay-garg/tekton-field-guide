@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: container-ci-run-001
+spec:
+  pipelineRef:
+    name: container-ci-pipeline
+  params:
+    # traefik/whoami — tiny Go HTTP server, minimal self-contained Dockerfile,
+    # no external dependencies, builds in seconds. Good demo target.
+    # Swap git-url for your own application repo when ready.
+    # git-revision is left empty so git-clone uses HEAD of the default branch
+    # automatically — works whether the repo uses main, master, or anything else.
+    - name: git-url
+      value: "https://github.com/traefik/whoami"
+    - name: git-revision
+      value: ""
+    # Replace with your own registry + image name
+    - name: image-name
+      value: "docker.io/ayushgarglinux/whoami-demo"
+    - name: dockerfile-path
+      value: "./Dockerfile"
+    - name: context-path
+      value: "."
+  workspaces:
+    - name: source
+      persistentVolumeClaim:
+        claimName: ci-pipeline-pvc
+    - name: registry-auth
+      secret:
+        secretName: registry-credentials

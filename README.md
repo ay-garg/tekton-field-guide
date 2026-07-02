@@ -13,7 +13,7 @@ A practical Tekton reference for engineers building or contributing to Kubernete
 | # | Topic | Difficulty | Files |
 |---|-------|-----------|-------|
 | 01 | [Architecture & Installation](#01-architecture--installation) | Beginner | `kind-config.yaml` |
-| 02 | [Tasks & TaskRuns](#02-tasks--taskruns) | Beginner | `01-hello-task.yaml` · `01-taskrun.yaml` · `02-build-info-task.yaml` |
+| 02 | [Tasks & TaskRuns](#02-tasks--taskruns) | Beginner | `02-hello-task.yaml` · `02-taskrun.yaml` · `02-build-info-task.yaml` |
 | 03 | [Pipelines & PipelineRuns](#03-pipelines--pipelineruns) | Beginner | `03-tasks.yaml` · `03-pipeline.yaml` · `03-pipelinerun.yaml` |
 | 04 | [Workspaces](#04-workspaces) | Intermediate | `04-workspace-resources.yaml` · `04-workspace-pipeline.yaml` · `04-pipelinerun.yaml` |
 | 05 | [Triggers](#05-triggers) | Intermediate | `05-triggers-rbac.yaml` · `05-triggerbinding.yaml` · `05-triggertemplate.yaml` · `05-eventlistener.yaml` · `05-webhook-secret.yaml` |
@@ -60,8 +60,8 @@ tekton-field-guide/
 │   ├── kind-config.yaml
 │   └── commands.yaml
 ├── 02-tasks-and-taskruns/
-│   ├── 01-hello-task.yaml
-│   ├── 01-taskrun.yaml
+│   ├── 02-hello-task.yaml
+│   ├── 02-taskrun.yaml
 │   ├── 02-build-info-task.yaml
 │   └── commands.yaml
 ├── 03-pipelines-and-pipelineruns/

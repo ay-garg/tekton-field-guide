@@ -1,0 +1,3044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tekton Mastery — Practical Reference</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<style>
+:root {
+  --bg: #0d1117; --bg2: #161b22; --bg3: #21262d;
+  --border: #30363d; --text: #c9d1d9; --muted: #8b949e;
+  --bright: #f0f6fc; --blue: #58a6ff; --green: #3fb950;
+  --yellow: #d29922; --red: #f85149; --purple: #bc8cff;
+  --cyan: #79c0ff; --orange: #ffa657;
+  --beginner: #3fb950; --intermediate: #d29922; --advanced: #f85149; --expert: #bc8cff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+/* LAYOUT */
+.layout { display:grid; grid-template-columns: 260px 1fr; min-height:100vh; }
+.sidebar { background:var(--bg2); border-right:1px solid var(--border); position:sticky; top:0; height:100vh; overflow-y:auto; padding:1rem 0; }
+.main { padding:0 0 4rem 0; max-width:960px; }
+
+/* SIDEBAR */
+.sidebar-brand { padding:1rem 1.25rem 1.5rem; border-bottom:1px solid var(--border); margin-bottom:.75rem; }
+.sidebar-brand h3 { font-size:.85rem; font-weight:700; color:var(--bright); letter-spacing:.05em; text-transform:uppercase; }
+.sidebar-brand p { font-size:.75rem; color:var(--muted); margin-top:.25rem; }
+.sidebar nav a { display:flex; align-items:center; gap:.75rem; padding:.5rem 1.25rem; text-decoration:none; color:var(--muted); font-size:.82rem; transition:background .15s,color .15s; }
+.sidebar nav a:hover, .sidebar nav a.active { background:var(--bg3); color:var(--bright); }
+.sidebar nav a .num { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; flex-shrink:0; }
+.n1 .num { background:#3fb95033; color:var(--beginner); }
+.n2 .num { background:#3fb95033; color:var(--beginner); }
+.n3 .num { background:#3fb95033; color:var(--beginner); }
+.n4 .num { background:#d2992233; color:var(--intermediate); }
+.n5 .num { background:#d2992233; color:var(--intermediate); }
+.n6 .num { background:#d2992233; color:var(--intermediate); }
+.n7 .num { background:#f8514933; color:var(--advanced); }
+.n8 .num { background:#f8514933; color:var(--advanced); }
+.n9 .num { background:#f8514933; color:var(--advanced); }
+.n10 .num { background:#bc8cff33; color:var(--expert); }
+
+/* HERO */
+.hero { background:linear-gradient(135deg,#0d1117 0%,#1a1f2e 50%,#0d1117 100%); border-bottom:1px solid var(--border); padding:3rem 2.5rem; }
+.hero-badge { display:inline-flex; align-items:center; gap:.5rem; background:var(--bg3); border:1px solid var(--border); border-radius:20px; padding:.35rem .9rem; font-size:.75rem; color:var(--muted); margin-bottom:1.25rem; }
+.hero h1 { font-size:2.2rem; font-weight:800; color:var(--bright); line-height:1.2; margin-bottom:.75rem; }
+.hero h1 span { color:var(--blue); }
+.hero p { font-size:1rem; color:var(--muted); max-width:600px; margin-bottom:1.5rem; }
+.stats { display:flex; gap:2rem; flex-wrap:wrap; }
+.stat { text-align:center; }
+.stat .val { font-size:1.6rem; font-weight:800; color:var(--bright); display:block; }
+.stat .lbl { font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+.playlist-box { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:1rem 1.5rem; margin-top:1.5rem; max-width:700px; }
+.playlist-box h4 { font-size:.8rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.5rem; }
+.playlist-box p { font-size:1rem; color:var(--blue); font-weight:600; }
+
+/* VIDEO SECTION */
+.video-section { border-bottom:1px solid var(--border); }
+.video-header { padding:2rem 2.5rem 1.5rem; border-bottom:1px solid var(--border); }
+.video-header-top { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
+.video-num { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+.badges { display:flex; gap:.5rem; flex-wrap:wrap; }
+.badge { padding:.25rem .75rem; border-radius:20px; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+.badge.beginner { background:#3fb95022; color:var(--beginner); border:1px solid #3fb95044; }
+.badge.intermediate { background:#d2992222; color:var(--intermediate); border:1px solid #d2992244; }
+.badge.advanced { background:#f8514922; color:var(--advanced); border:1px solid #f8514944; }
+.badge.expert { background:#bc8cff22; color:var(--expert); border:1px solid #bc8cff44; }
+.badge.duration { background:var(--bg3); color:var(--muted); border:1px solid var(--border); }
+.video-header h2 { font-size:1.5rem; font-weight:700; color:var(--bright); margin-bottom:.5rem; }
+.yt-title { display:flex; align-items:center; gap:.6rem; background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:.6rem 1rem; margin-top:.75rem; max-width:fit-content; }
+.yt-icon { font-size:.9rem; }
+.yt-title span { font-size:.82rem; color:var(--muted); }
+.yt-title strong { color:var(--text); font-weight:500; }
+
+/* CONTENT SECTIONS */
+.video-body { padding:1.5rem 2.5rem; }
+.section-block { margin-bottom:2rem; }
+.section-block h3 { font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:.5rem; }
+.learn-grid { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+.learn-item { display:flex; align-items:flex-start; gap:.5rem; font-size:.88rem; }
+.learn-item::before { content:"✓"; color:var(--green); font-weight:700; flex-shrink:0; margin-top:.1rem; }
+
+/* VOICEOVER */
+.voiceover-box { background:linear-gradient(135deg,#0d1f1233,#0d1117); border:1px solid #3fb95044; border-left:3px solid var(--green); border-radius:8px; padding:1.25rem 1.5rem; }
+.vo-header { display:flex; align-items:center; gap:.6rem; margin-bottom:1rem; }
+.vo-header span { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--green); }
+.vo-segment { margin-bottom:1rem; }
+.vo-cue { font-size:.72rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.1em; margin-bottom:.25rem; padding:.15rem .5rem; background:var(--bg3); border-radius:4px; display:inline-block; }
+.vo-text { font-size:.9rem; color:var(--text); font-style:italic; line-height:1.7; }
+
+/* DEMO STEPS */
+.steps ol { padding-left:1.5rem; }
+.steps li { margin-bottom:.75rem; font-size:.9rem; }
+.steps li strong { color:var(--bright); }
+.steps li code { background:var(--bg3); padding:.1rem .35rem; border-radius:4px; font-size:.82rem; color:var(--cyan); font-family:'SF Mono','Fira Code',monospace; }
+
+/* CODE BLOCKS */
+.code-file { margin-bottom:1.25rem; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.code-filename { background:var(--bg3); padding:.5rem 1rem; font-size:.78rem; font-family:'SF Mono','Fira Code',monospace; color:var(--orange); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:.5rem; }
+.code-filename::before { content:"📄"; font-size:.9rem; }
+pre { margin:0; overflow-x:auto; }
+pre code { font-size:.8rem; line-height:1.6; font-family:'SF Mono','Fira Code','Cascadia Code',monospace; display:block; padding:1rem; background:var(--bg2); }
+.cmd-block { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.cmd-header { background:var(--bg3); padding:.4rem 1rem; font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; border-bottom:1px solid var(--border); }
+.cmd-block pre code { background:var(--bg); color:#afffb8; }
+
+/* KONFLUX CALLOUT */
+.konflux-box { background:linear-gradient(135deg,#1a1030,#0d1117); border:1px solid #bc8cff44; border-left:3px solid var(--purple); border-radius:8px; padding:1.25rem 1.5rem; }
+.konflux-box h4 { color:var(--purple); font-size:.82rem; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
+.konflux-box p, .konflux-box li { font-size:.88rem; color:var(--text); }
+.konflux-box ul { padding-left:1.25rem; }
+.konflux-box li { margin-bottom:.35rem; }
+
+/* TAKEAWAYS */
+.takeaways ul { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; list-style:none; padding:0; }
+.takeaways li { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:.6rem .9rem; font-size:.83rem; display:flex; align-items:flex-start; gap:.5rem; }
+.takeaways li::before { content:"→"; color:var(--blue); font-weight:700; flex-shrink:0; }
+
+/* PREREQS */
+.prereq-list { display:flex; flex-wrap:wrap; gap:.5rem; }
+.prereq { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:.35rem .75rem; font-size:.8rem; color:var(--muted); }
+.prereq.none { color:var(--green); border-color:#3fb95044; }
+
+/* CLUSTER OPTIONS */
+.cluster-options-box { background:linear-gradient(135deg,#0a1929,#0d1117); border:1px solid #79c0ff44; border-left:3px solid var(--cyan); border-radius:8px; padding:1.25rem 1.5rem; margin-top:1rem; }
+.cluster-options-box h4 { color:var(--cyan); font-size:.82rem; text-transform:uppercase; letter-spacing:.1em; margin-bottom:.6rem; display:flex; align-items:center; gap:.5rem; }
+.cluster-options-box > p { font-size:.85rem; color:var(--text); margin-bottom:.75rem; }
+.cluster-grid { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+.cluster-item { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:.6rem .9rem; }
+.cluster-item a { color:var(--blue); text-decoration:none; font-size:.85rem; font-weight:600; }
+.cluster-item a:hover { text-decoration:underline; }
+.cluster-item .cluster-desc { font-size:.78rem; color:var(--muted); margin:.3rem 0 0 0; line-height:1.5; }
+
+/* HLJS OVERRIDES */
+.hljs { background:var(--bg2) !important; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns:1fr; }
+  .sidebar { display:none; }
+  .learn-grid, .takeaways ul, .cluster-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h3>Tekton Mastery</h3>
+    <p>Practical Reference · 9 Topics</p>
+  </div>
+  <nav>
+    <a href="#video-1" class="n1"><span class="num">1</span> Architecture &amp; Installation</a>
+    <a href="#video-2" class="n2"><span class="num">2</span> Tasks &amp; TaskRuns</a>
+    <a href="#video-3" class="n3"><span class="num">3</span> Pipelines &amp; PipelineRuns</a>
+    <a href="#video-4" class="n4"><span class="num">4</span> Workspaces</a>
+    <a href="#video-5" class="n5"><span class="num">5</span> Triggers</a>
+    <a href="#video-6" class="n6"><span class="num">6</span> Artifact Hub &amp; Real CI</a>
+    <a href="#video-7" class="n7"><span class="num">7</span> Advanced Patterns</a>
+    <a href="#video-8" class="n8"><span class="num">8</span> Chains &amp; Security</a>
+    <a href="#video-9" class="n9"><span class="num">9</span> Container Build Pipeline</a>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Tekton Mastery:<br><span>Practical Reference</span></h1>
+  <p>A practical reference — YAMLs, commands, and demo steps for every topic. Designed for engineers who will contribute to or work on Konflux.</p>
+  <div class="stats">
+    <div class="stat"><span class="val">9</span><span class="lbl">Topics</span></div>
+    <div class="stat"><span class="val">40+</span><span class="lbl">YAML Files</span></div>
+    <div class="stat"><span class="val">3</span><span class="lbl">Difficulty Levels</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     VIDEO 1
+════════════════════════════════════════════════════ -->
+<section class="video-section" id="video-1">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Architecture &amp; Setup</span>
+      <div class="badges">
+        <span class="badge beginner">Beginner</span>
+        <span class="badge duration">⏱ 20 min</span>
+      </div>
+    </div>
+    <h2>Tekton Architecture &amp; Installation — The Kubernetes-Native CI/CD Engine</h2>
+  </div>
+
+  <div class="video-body">
+
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">Why Tekton exists and how it differs from Jenkins/GitHub Actions</div>
+        <div class="learn-item">Tekton's four main components: Pipelines, Triggers, Chains, Dashboard</div>
+        <div class="learn-item">How Tekton maps to Kubernetes primitives (CRDs, Pods, PVCs)</div>
+        <div class="learn-item">Install Tekton on a local cluster (Kind, minikube, CRC, or OpenShift) and verify the setup</div>
+        <div class="learn-item">Install and use the <code>tkn</code> CLI</div>
+        <div class="learn-item">Browse Tekton CRDs and understand the API surface</div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Prerequisites</h3>
+      <div class="prereq-list">
+        <span class="prereq none">No prior Tekton knowledge needed</span>
+        <span class="prereq">kubectl installed</span>
+        <span class="prereq">Kind, minikube, CRC, or OpenShift cluster</span>
+        <span class="prereq">Basic Kubernetes familiarity (Pods, Namespaces)</span>
+      </div>
+      <div class="cluster-options-box">
+        <h4>☸ Local Cluster Options — Any Works with Tekton</h4>
+        <p>Tekton runs on any Kubernetes-compatible cluster. This video uses <strong>Kind</strong> (fastest local setup). Pick whichever fits your environment — all kubectl and tkn commands are identical after cluster creation.</p>
+        <div class="cluster-grid">
+          <div class="cluster-item">
+            <a href="https://kind.sigs.k8s.io/" target="_blank" rel="noopener">Kind — Kubernetes in Docker</a>
+            <p class="cluster-desc">Lightweight clusters using Docker containers as nodes. Setup in ~30 seconds, no VM required, multi-node support. Recommended for this series.</p>
+          </div>
+          <div class="cluster-item">
+            <a href="https://minikube.sigs.k8s.io/docs/start/" target="_blank" rel="noopener">Minikube</a>
+            <p class="cluster-desc">Single-node cluster with built-in addons (ingress, metrics-server, dashboard). Supports Docker, VirtualBox, and HyperKit drivers.</p>
+          </div>
+          <div class="cluster-item">
+            <a href="https://developers.redhat.com/products/openshift-local/overview" target="_blank" rel="noopener">CRC — OpenShift Local</a>
+            <p class="cluster-desc">Full OpenShift 4 experience on your laptop. Closest to Konflux's production environment. Requires ≥18 GB RAM and a Red Hat account.</p>
+          </div>
+          <div class="cluster-item">
+            <a href="https://www.redhat.com/en/technologies/cloud-computing/openshift" target="_blank" rel="noopener">OpenShift</a> / <a href="https://kubernetes.io/" target="_blank" rel="noopener">Any Kubernetes</a>
+            <p class="cluster-desc">Cloud or on-prem clusters (EKS, GKE, AKS, OpenShift). Tekton is pre-installed on OpenShift as OpenShift Pipelines — no extra setup needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Create a Kind cluster</strong> using a config file. Verify it's ready with <code>kubectl cluster-info --context kind-tekton-demo</code> and <code>kubectl get nodes</code>.</li>
+        <li><strong>Install Tekton Pipelines</strong> by applying the release manifest. Wait for all pods to be Running in the <code>tekton-pipelines</code> namespace.</li>
+        <li><strong>Install Tekton Dashboard</strong> by applying its release manifest.</li>
+        <li><strong>Install the tkn CLI</strong> — show both Homebrew (Mac) and curl (Linux) methods.</li>
+        <li><strong>Verify installation</strong>: run <code>tkn version</code>, show the CRDs with <code>kubectl get crds | grep tekton</code>.</li>
+        <li><strong>Port-forward the Dashboard</strong> and open it in a browser. Show the empty state.</li>
+        <li><strong>Explore the API</strong>: run <code>kubectl explain task</code>, <code>kubectl explain pipeline</code>.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+
+      <div class="code-file">
+        <div class="code-filename">kind-config.yaml  (create this file before running <code>kind create cluster</code>)</div>
+        <pre><code class="language-yaml">kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: tekton-demo
+nodes:
+  - role: control-plane
+    # Expose ports for NodePort services (useful for EventListeners in Video 5)
+    extraPortMappings:
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+      - containerPort: 30001
+        hostPort: 30001
+        protocol: TCP
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+# Kind uses Docker — set resources in Docker Desktop:
+# Settings > Resources:  CPUs: 4+   Memory: 8 GB+   Disk: 30 GB+</code></pre>
+      </div>
+
+      <div class="cmd-block">
+        <div class="cmd-header">terminal — run in order</div>
+        <pre><code class="language-bash"># ── STEP 1: Install Kind ──────────────────────────────────────
+# macOS
+brew install kind
+
+# Linux
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.25.0/kind-linux-amd64
+chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
+
+# Windows (PowerShell)
+# choco install kind
+
+# Verify
+kind --version
+
+# ── STEP 2: Create the Kind cluster ───────────────────────────
+kind create cluster --config kind-config.yaml
+
+# Verify the cluster is up and kubectl context is set
+kubectl cluster-info --context kind-tekton-demo
+kubectl get nodes
+
+# ── STEP 3: Install Tekton Pipelines (latest stable) ──────────
+kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+
+# Wait for Tekton controller to be ready
+kubectl wait --for=condition=ready pod \
+  --selector=app=tekton-pipelines-controller \
+  --namespace=tekton-pipelines \
+  --timeout=180s
+
+# Verify all Tekton pods are Running
+kubectl get pods -n tekton-pipelines
+
+# ── STEP 4: Install Tekton Dashboard ──────────────────────────
+kubectl apply -f https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
+
+# ── STEP 5: Install tkn CLI ───────────────────────────────────
+# macOS
+brew install tektoncd-cli
+
+# Linux — check https://github.com/tektoncd/cli/releases for the latest version
+curl -LO https://github.com/tektoncd/cli/releases/latest/download/tkn_Linux_x86_64.tar.gz
+tar xzf tkn_Linux_x86_64.tar.gz -C /usr/local/bin tkn
+
+# ── STEP 6: Verify everything ─────────────────────────────────
+tkn version
+kubectl get pods -n tekton-pipelines
+
+# Explore Tekton CRDs installed in the cluster
+kubectl get crds | grep tekton
+
+# Explain the Task CRD fields
+kubectl explain task.spec
+kubectl explain task.spec.steps
+
+# ── STEP 7: Open the Dashboard ────────────────────────────────
+kubectl port-forward -n tekton-pipelines svc/tekton-dashboard 9097:9097
+# Open: http://localhost:9097
+
+# ── ALTERNATIVE cluster setups (commands above are identical after this) ──
+# Minikube:
+#   minikube start --cpus=4 --memory=8192 --disk-size=30g
+#   minikube addons enable ingress
+#
+# CRC (OpenShift Local):
+#   crc start --cpus 4 --memory 12288
+#   eval $(crc oc-env)          # OpenShift Pipelines (Tekton) already installed
+#
+# OpenShift / Any Kubernetes:
+#   oc login https://api.your-cluster.example.com
+#   # On OpenShift, install OpenShift Pipelines Operator from OperatorHub instead:
+#   # OperatorHub > OpenShift Pipelines > Install</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>Konflux runs on OpenShift with Tekton Pipelines, Triggers, and Chains all installed cluster-wide. The exact CRDs you see here — <code>Task</code>, <code>Pipeline</code>, <code>PipelineRun</code> — are what Konflux creates when you push code to a Component. The Tekton Dashboard you just set up mirrors the <strong>Pipeline Runs</strong> tab in the Konflux UI. Whenever a Konflux build fails, you can look at the raw PipelineRun object to understand what happened at the Tekton level.</p>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>Tekton is Kubernetes-native — everything is a CRD</li>
+        <li>Four components: Pipelines, Triggers, Chains, Dashboard</li>
+        <li>Every pipeline run becomes real Kubernetes Pods</li>
+        <li>tkn CLI is the primary tool for interacting with Tekton</li>
+        <li>Same tech stack that powers Konflux in production</li>
+        <li>Tekton v1 API is stable — use <code>tekton.dev/v1</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     VIDEO 2
+════════════════════════════════════════════════════ -->
+<section class="video-section" id="video-2">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Tasks &amp; TaskRuns</span>
+      <div class="badges">
+        <span class="badge beginner">Beginner</span>
+        <span class="badge duration">⏱ 25 min</span>
+      </div>
+    </div>
+    <h2>Tasks &amp; TaskRuns — The Atomic Building Blocks of Tekton</h2>
+  </div>
+
+  <div class="video-body">
+
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">Task anatomy: steps, params, results, workspaces, stepTemplate</div>
+        <div class="learn-item">How each Step becomes a container in a Pod</div>
+        <div class="learn-item">Declaring and using Parameters with defaults and descriptions</div>
+        <div class="learn-item">Writing Task Results — passing values downstream</div>
+        <div class="learn-item">Creating TaskRuns imperatively and declaratively</div>
+        <div class="learn-item">Streaming logs and inspecting TaskRun status</div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Prerequisites</h3>
+      <div class="prereq-list">
+        <span class="prereq">Video 1 complete</span>
+        <span class="prereq">Tekton Pipelines installed</span>
+        <span class="prereq">tkn CLI working</span>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Create the hello-world task</strong> — apply <code>02-hello-task.yaml</code>, inspect with <code>tkn task describe</code>.</li>
+        <li><strong>Run it declaratively</strong> — apply <code>02-taskrun.yaml</code>, watch with <code>tkn taskrun logs -f</code>.</li>
+        <li><strong>Inspect the Pod</strong> — run <code>kubectl get pods</code> and show the init containers Tekton injects.</li>
+        <li><strong>Run it with tkn CLI</strong> — use <code>tkn task start hello-world --param name=Konflux</code> to demonstrate the imperative approach.</li>
+        <li><strong>Create the parameterized multi-step task</strong> — apply <code>02-build-info-task.yaml</code>.</li>
+        <li><strong>Run it and show Results</strong> — use <code>tkn taskrun describe</code> to see the captured result values.</li>
+        <li><strong>Show failure handling</strong> — demonstrate what happens when a step exits non-zero.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">02-hello-task.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: hello-world
+  labels:
+    app.kubernetes.io/version: "1.0"
+  annotations:
+    tekton.dev/displayName: "Hello World"
+    tekton.dev/description: "A simple hello world to demonstrate Task structure"
+spec:
+  description: "Greets a user and shows basic Tekton Task concepts"
+  params:
+    - name: name
+      type: string
+      default: "Tekton Learner"
+      description: "The name of the person to greet"
+    - name: language
+      type: string
+      default: "english"
+      description: "Greeting language: english, spanish, french"
+  results:
+    - name: greeting
+      description: "The full greeting message that was printed"
+  steps:
+    - name: greet
+      image: alpine:3.18
+      env:
+        - name: GREETING_NAME
+          value: "$(params.name)"
+        - name: LANG_CHOICE
+          value: "$(params.language)"
+      script: |
+        #!/bin/sh
+        set -e
+        case "$LANG_CHOICE" in
+          spanish) MSG="¡Hola, $GREETING_NAME! Bienvenido a Tekton." ;;
+          french)  MSG="Bonjour, $GREETING_NAME! Bienvenue sur Tekton." ;;
+          *)       MSG="Hello, $GREETING_NAME! Welcome to Tekton." ;;
+        esac
+        echo "$MSG"
+        # Write the greeting as a Task Result
+        printf '%s' "$MSG" | tee "$(results.greeting.path)"
+    - name: show-tekton-facts
+      image: alpine:3.18
+      script: |
+        #!/bin/sh
+        echo ""
+        echo "=== About This Execution ==="
+        echo "This step runs AFTER the greet step in the SAME Pod."
+        echo "Hostname (Pod name): $(hostname)"
+        echo "Date: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+        echo "Tekton injects metadata via the downward API."
+        echo "Each Step is a separate container init that runs sequentially."
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">02-taskrun.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: hello-world-run-001
+  labels:
+    # Labels make it easy to query related runs
+    task-name: hello-world
+    run-by: demo-video-2
+spec:
+  taskRef:
+    name: hello-world
+  params:
+    - name: name
+      value: "Konflux Engineer"
+    - name: language
+      value: "english"
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">02-build-info-task.yaml  (demonstrates results and stepTemplate)</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-info
+  annotations:
+    tekton.dev/displayName: "Build Info Collector"
+spec:
+  description: "Collects build metadata and surfaces it as Task Results for downstream tasks"
+  params:
+    - name: image-name
+      type: string
+      description: "The name of the image being built (e.g. myapp)"
+    - name: git-revision
+      type: string
+      default: "main"
+      description: "Git revision being built"
+    - name: registry
+      type: string
+      default: "quay.io/myorg"
+      description: "Target container registry"
+  results:
+    - name: image-url
+      description: "Full image URL including registry and name"
+    - name: build-timestamp
+      description: "Unix timestamp when the build started"
+    - name: image-tag
+      description: "The tag that will be applied to the image"
+  # stepTemplate applies these fields to ALL steps — avoids repetition
+  stepTemplate:
+    image: alpine:3.18
+    env:
+      - name: IMAGE_NAME
+        value: "$(params.image-name)"
+      - name: GIT_REVISION
+        value: "$(params.git-revision)"
+      - name: REGISTRY
+        value: "$(params.registry)"
+  steps:
+    - name: compute-tag
+      script: |
+        #!/bin/sh
+        set -e
+        # In real pipelines this comes from git describe or the commit SHA
+        TAG="$(date -u '+%Y%m%d')-${GIT_REVISION}"
+        echo "Computed image tag: $TAG"
+        printf '%s' "$TAG" | tee "$(results.image-tag.path)"
+
+    - name: compute-image-url
+      script: |
+        #!/bin/sh
+        set -e
+        TAG=$(cat "$(results.image-tag.path)")
+        IMAGE_URL="${REGISTRY}/${IMAGE_NAME}:${TAG}"
+        echo "Full image URL: $IMAGE_URL"
+        printf '%s' "$IMAGE_URL" | tee "$(results.image-url.path)"
+
+    - name: record-timestamp
+      script: |
+        #!/bin/sh
+        set -e
+        TS=$(date -u '+%s')
+        echo "Build timestamp: $TS"
+        printf '%s' "$TS" | tee "$(results.build-timestamp.path)"
+
+    - name: print-summary
+      script: |
+        #!/bin/sh
+        echo ""
+        echo "=== Build Info Summary ==="
+        echo "Image:     $(cat $(results.image-url.path))"
+        echo "Tag:       $(cat $(results.image-tag.path))"
+        echo "Timestamp: $(cat $(results.build-timestamp.path))"
+        echo ""
+        echo "These results are now available to any downstream Task"
+        echo "in a Pipeline via: \$(tasks.build-info.results.image-url)"
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Apply the Task definition
+kubectl apply -f 02-hello-task.yaml
+
+# List tasks in the cluster
+tkn task list
+
+# Describe the task (shows params, results, steps)
+tkn task describe hello-world
+
+# Run declaratively
+kubectl apply -f 02-taskrun.yaml
+
+# Follow logs in real time
+tkn taskrun logs hello-world-run-001 -f
+
+# Describe the run — see status, results, pod name
+tkn taskrun describe hello-world-run-001
+
+# Inspect the underlying Pod
+kubectl get pods | grep hello-world-run-001
+kubectl describe pod hello-world-run-001-pod
+
+# Run imperatively with the CLI (creates TaskRun automatically)
+tkn task start hello-world \
+  --param name="Konflux Engineer" \
+  --param language="spanish" \
+  --showlog
+
+# Apply and run the second task
+kubectl apply -f 02-build-info-task.yaml
+tkn task start build-info \
+  --param image-name="my-app" \
+  --param git-revision="abc1234" \
+  --param registry="quay.io/myorg" \
+  --showlog
+
+# See the results captured by Tekton
+tkn taskrun describe --last</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>Konflux build pipelines consist of ~12 Tasks chained together. Each Task follows exactly this pattern. Key examples:</p>
+        <ul>
+          <li>The <strong>clone-repository</strong> task produces a <code>commit</code> result (the full git SHA) that flows into build tasks</li>
+          <li>The <strong>build-container</strong> task (using Buildah) produces an <code>IMAGE_DIGEST</code> result that Tekton Chains uses to sign the image</li>
+          <li>The <strong>IMAGE_URL</strong> and <strong>IMAGE_DIGEST</strong> results from the build pipeline become part of the Konflux Snapshot</li>
+          <li>Every Konflux Task uses <code>stepTemplate</code> to inject a common security context (non-root, read-only root FS)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>Task = reusable unit of work defined as a CRD</li>
+        <li>Steps run sequentially in the same Pod</li>
+        <li>Params use <code>$(params.name)</code> substitution syntax</li>
+        <li>Results written to <code>$(results.name.path)</code></li>
+        <li>TaskRun = one execution instance of a Task</li>
+        <li>stepTemplate reduces repetition across steps</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     VIDEO 3
+════════════════════════════════════════════════════ -->
+<section class="video-section" id="video-3">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Pipelines &amp; PipelineRuns</span>
+      <div class="badges">
+        <span class="badge beginner">Beginner</span>
+        <span class="badge duration">⏱ 30 min</span>
+      </div>
+    </div>
+    <h2>Pipelines &amp; PipelineRuns — Orchestrating Tasks Into a Real Workflow</h2>
+  </div>
+
+  <div class="video-body">
+
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">Pipeline structure and how it references Tasks</div>
+        <div class="learn-item">Sequential vs. parallel task execution with <code>runAfter</code></div>
+        <div class="learn-item">Passing Task results to downstream tasks</div>
+        <div class="learn-item">Pipeline-level params and results</div>
+        <div class="learn-item">Creating and monitoring PipelineRuns</div>
+        <div class="learn-item">Visualizing the DAG in Tekton Dashboard</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Apply the three tasks</strong> individually: validate-input, run-checks (used for both lint and test), generate-report.</li>
+        <li><strong>Apply the pipeline</strong> — inspect with <code>tkn pipeline describe</code> and show the DAG.</li>
+        <li><strong>Start the PipelineRun</strong> with <code>tkn pipeline start</code> and follow logs.</li>
+        <li><strong>Open the Dashboard</strong> and watch the parallel tasks (lint + test) execute simultaneously, then report waits for both.</li>
+        <li><strong>Inspect the PipelineRun</strong> — show how results from individual task runs are accessible.</li>
+        <li><strong>Demonstrate failure</strong> — change the repo URL to something invalid and show the pipeline failing at the validation step, with lint and test never starting.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">03-tasks.yaml  (three task definitions used by the pipeline)</div>
+        <pre><code class="language-yaml">---
+# Task 1: Validates the repository URL and extracts the repo name
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: validate-repo
+spec:
+  description: "Validates a Git repository URL and extracts the project name"
+  params:
+    - name: repo-url
+      type: string
+  results:
+    - name: repo-name
+      description: "Short repository name extracted from the URL"
+    - name: repo-host
+      description: "The hosting service: github or gitlab"
+  steps:
+    - name: validate-and-extract
+      image: alpine:3.18
+      env:
+        - name: REPO_URL
+          value: "$(params.repo-url)"
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Validating: $REPO_URL"
+        if echo "$REPO_URL" | grep -q "github.com"; then
+          HOST="github"
+        elif echo "$REPO_URL" | grep -q "gitlab.com"; then
+          HOST="gitlab"
+        else
+          echo "ERROR: Unsupported host. Use github.com or gitlab.com"
+          exit 1
+        fi
+        REPO_NAME=$(echo "$REPO_URL" | sed 's|.*/||' | sed 's|\.git$||')
+        echo "Host: $HOST"
+        echo "Repo name: $REPO_NAME"
+        printf '%s' "$HOST"      | tee "$(results.repo-host.path)"
+        printf '%s' "$REPO_NAME" | tee "$(results.repo-name.path)"
+---
+# Task 2: Simulates a code check (used for both lint and test steps)
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: run-check
+spec:
+  description: "Simulates running a code quality check (lint or test)"
+  params:
+    - name: check-type
+      type: string
+      description: "Type of check: lint or test"
+    - name: repo-name
+      type: string
+  results:
+    - name: status
+      description: "Check result: pass or fail"
+    - name: finding-count
+      description: "Number of findings (0 = clean)"
+  steps:
+    - name: execute-check
+      image: alpine:3.18
+      env:
+        - name: CHECK_TYPE
+          value: "$(params.check-type)"
+        - name: REPO_NAME
+          value: "$(params.repo-name)"
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Running $CHECK_TYPE check for: $REPO_NAME"
+        echo "Simulating work..."
+        sleep 2
+        COUNT=0
+        echo "$CHECK_TYPE complete. Findings: $COUNT"
+        printf '%s' "pass"  | tee "$(results.status.path)"
+        printf '%s' "$COUNT" | tee "$(results.finding-count.path)"
+---
+# Task 3: Generates a summary report from all previous task results
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: quality-report
+spec:
+  description: "Generates a final quality report from lint and test results"
+  params:
+    - name: repo-name
+      type: string
+    - name: repo-host
+      type: string
+    - name: lint-status
+      type: string
+    - name: lint-findings
+      type: string
+    - name: test-status
+      type: string
+    - name: test-findings
+      type: string
+  results:
+    - name: summary
+      description: "One-line quality summary"
+  steps:
+    - name: generate
+      image: alpine:3.18
+      script: |
+        #!/bin/sh
+        REPO="$(params.repo-name)"
+        HOST="$(params.repo-host)"
+        LINT="$(params.lint-status) ($(params.lint-findings) issues)"
+        TEST="$(params.test-status) ($(params.test-findings) findings)"
+        SUMMARY="[$HOST] $REPO — Lint: $LINT | Tests: $TEST"
+        echo ""
+        echo "=========================================="
+        echo " QUALITY REPORT"
+        echo "=========================================="
+        echo " Repository : $REPO"
+        echo " Host       : $HOST"
+        echo " Lint       : $LINT"
+        echo " Tests      : $TEST"
+        echo "=========================================="
+        printf '%s' "$SUMMARY" | tee "$(results.summary.path)"
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">03-pipeline.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: code-quality-pipeline
+  annotations:
+    tekton.dev/displayName: "Code Quality Pipeline"
+    tekton.dev/description: "Validates repo, runs lint + test in parallel, reports results"
+spec:
+  description: "Demonstrates task chaining, parallel execution, and result passing"
+  params:
+    - name: repo-url
+      type: string
+      description: "Full URL of the Git repository to check"
+      default: "https://github.com/tektoncd/pipeline"
+    - name: revision
+      type: string
+      default: "main"
+  # Pipeline surfaces a result from one of its tasks to callers
+  results:
+    - name: quality-summary
+      description: "Final quality report from the pipeline run"
+      value: "$(tasks.generate-report.results.summary)"
+
+  tasks:
+    # STEP 1 — Validate input (runs first, blocks everything else)
+    - name: validate
+      taskRef:
+        name: validate-repo
+      params:
+        - name: repo-url
+          value: "$(params.repo-url)"
+
+    # STEP 2a — Lint (runs in parallel with test, after validate)
+    - name: lint
+      runAfter:
+        - validate
+      taskRef:
+        name: run-check
+      params:
+        - name: check-type
+          value: "lint"
+        - name: repo-name
+          # Reference the result from the validate task
+          value: "$(tasks.validate.results.repo-name)"
+
+    # STEP 2b — Test (runs in parallel with lint, after validate)
+    - name: test
+      runAfter:
+        - validate
+      taskRef:
+        name: run-check
+      params:
+        - name: check-type
+          value: "test"
+        - name: repo-name
+          value: "$(tasks.validate.results.repo-name)"
+
+    # STEP 3 — Report (runs after BOTH lint and test complete)
+    - name: generate-report
+      runAfter:
+        - lint
+        - test
+      taskRef:
+        name: quality-report
+      params:
+        - name: repo-name
+          value: "$(tasks.validate.results.repo-name)"
+        - name: repo-host
+          value: "$(tasks.validate.results.repo-host)"
+        - name: lint-status
+          value: "$(tasks.lint.results.status)"
+        - name: lint-findings
+          value: "$(tasks.lint.results.finding-count)"
+        - name: test-status
+          value: "$(tasks.test.results.status)"
+        - name: test-findings
+          value: "$(tasks.test.results.finding-count)"
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">03-pipelinerun.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: quality-pipeline-run-001
+  labels:
+    pipeline-name: code-quality-pipeline
+spec:
+  pipelineRef:
+    name: code-quality-pipeline
+  params:
+    - name: repo-url
+      value: "https://github.com/tektoncd/pipeline"
+    - name: revision
+      value: "main"
+  # TaskRunSpecs lets you set compute limits per task
+  taskRunSpecs:
+    - pipelineTaskName: lint
+      computeResources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+    - pipelineTaskName: test
+      computeResources:
+        requests:
+          memory: "128Mi"
+          cpu: "200m"
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Apply all task definitions
+kubectl apply -f 03-tasks.yaml
+
+# Verify tasks are registered
+tkn task list
+
+# Apply the pipeline
+kubectl apply -f 03-pipeline.yaml
+
+# Describe pipeline — shows param definitions and task graph
+tkn pipeline describe code-quality-pipeline
+
+# Start pipeline interactively (tkn prompts for param values)
+tkn pipeline start code-quality-pipeline --showlog
+
+# Or apply the PipelineRun declaratively
+kubectl apply -f 03-pipelinerun.yaml
+
+# Watch the PipelineRun status
+tkn pipelinerun list
+tkn pipelinerun logs quality-pipeline-run-001 -f
+
+# Describe the run — see task results and pipeline result
+tkn pipelinerun describe quality-pipeline-run-001
+
+# See the underlying TaskRuns created by the pipeline
+kubectl get taskruns --selector=tekton.dev/pipelineRun=quality-pipeline-run-001
+
+# See the DAG in the Dashboard
+kubectl port-forward -n tekton-pipelines svc/tekton-dashboard 9097:9097
+# Open http://localhost:9097 and navigate to the PipelineRun</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>The Konflux build pipeline follows exactly this pattern. When a Konflux Component build starts:</p>
+        <ul>
+          <li>The <code>init</code> task runs first (validates component config)</li>
+          <li>The <code>clone-repository</code> task produces a <code>commit</code> result</li>
+          <li>Vulnerability scanning and SAST checks run in parallel after the build</li>
+          <li>The <code>IMAGE_DIGEST</code> result from <code>build-container</code> flows into all subsequent signing and scanning tasks</li>
+          <li>The Konflux Snapshot is created using the final image URL + digest results from the pipeline</li>
+          <li>PipelineRun labels like <code>appstudio.openshift.io/component</code> link the run back to the Konflux component</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>Pipeline = ordered DAG of Task instances</li>
+        <li>Tasks without shared <code>runAfter</code> run in parallel</li>
+        <li>Results flow via <code>$(tasks.&lt;name&gt;.results.&lt;key&gt;)</code></li>
+        <li>PipelineRun = one execution of a Pipeline</li>
+        <li>Use taskRunSpecs to set per-task resource limits</li>
+        <li>Dashboard shows the live DAG and per-task logs</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     VIDEO 4
+════════════════════════════════════════════════════ -->
+<section class="video-section" id="video-4">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Workspaces</span>
+      <div class="badges">
+        <span class="badge intermediate">Intermediate</span>
+        <span class="badge duration">⏱ 28 min</span>
+      </div>
+    </div>
+    <h2>Workspaces — Sharing Files, Secrets, and Config Between Tasks</h2>
+  </div>
+
+  <div class="video-body">
+
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">Why results aren't enough — you need workspaces for large data</div>
+        <div class="learn-item">Four workspace types: PVC, emptyDir, ConfigMap, Secret</div>
+        <div class="learn-item">Declaring workspaces in Tasks and Pipelines</div>
+        <div class="learn-item">Binding workspace types in PipelineRun</div>
+        <div class="learn-item">The classic clone-then-build pattern</div>
+        <div class="learn-item">Optional workspaces with conditional logic</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Create the PVC</strong> — apply <code>04-workspace-pvc.yaml</code>, verify with <code>kubectl get pvc</code>.</li>
+        <li><strong>Create a ConfigMap</strong> for configuration that will be injected as a workspace.</li>
+        <li><strong>Apply the tasks</strong>: writer task and reader task, both declaring workspaces.</li>
+        <li><strong>Apply the pipeline</strong> that wires workspace slots to task workspace names.</li>
+        <li><strong>Apply the PipelineRun</strong> that binds the PVC and ConfigMap to workspace slots.</li>
+        <li><strong>Watch execution</strong> — show that the reader task can see files written by the writer task.</li>
+        <li><strong>Show emptyDir</strong> variant — discuss when to use emptyDir vs PVC.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">04-workspace-resources.yaml  (PVC + ConfigMap)</div>
+        <pre><code class="language-yaml">---
+# PersistentVolumeClaim — shared storage for Tasks in the pipeline
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pipeline-workspace-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  # On Minikube the default StorageClass provisions hostPath volumes
+  # On cloud clusters (EKS, GKE, OpenShift) use the cluster's default SC
+---
+# ConfigMap used as a read-only config workspace
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-config
+data:
+  config.yaml: |
+    version: "1.0"
+    build:
+      output_dir: /workspace/source/dist
+      optimization: true
+      target: linux/amd64
+    lint:
+      max_issues: 0
+      strict: true
+  .golangci.yml: |
+    run:
+      timeout: 5m
+    linters:
+      enable:
+        - errcheck
+        - gosimple
+        - staticcheck
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">04-workspace-pipeline.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: workspace-demo-pipeline
+spec:
+  description: "Demonstrates workspace usage: PVC for source, ConfigMap for config, Secret for creds"
+  params:
+    - name: app-name
+      type: string
+      default: "my-app"
+  # Pipeline-level workspace declarations — these are the slots
+  workspaces:
+    - name: source
+      description: "Shared PVC workspace for source files — all tasks share this"
+    - name: build-config
+      description: "ConfigMap workspace with build configuration (read-only)"
+    - name: registry-credentials
+      description: "Secret workspace with container registry credentials"
+      optional: true
+
+  tasks:
+    # Task 1: Write simulated source files to the shared workspace
+    - name: write-source
+      workspaces:
+        - name: source         # task's workspace name
+          workspace: source    # pipeline's workspace slot name
+        - name: config
+          workspace: build-config
+      taskSpec:
+        workspaces:
+          - name: source
+            description: "Where to write source files"
+          - name: config
+            description: "Build configuration (read-only)"
+        params:
+          - name: app-name
+            type: string
+        steps:
+          - name: create-source
+            image: alpine:3.18
+            env:
+              - name: APP
+                value: "$(params.app-name)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "Writing source to: $(workspaces.source.path)"
+              mkdir -p "$(workspaces.source.path)/src"
+              mkdir -p "$(workspaces.source.path)/tests"
+
+              # Simulate writing application code
+              cat > "$(workspaces.source.path)/src/main.go" &lt;&lt; 'EOF'
+              package main
+
+              import "fmt"
+
+              func main() {
+                  fmt.Println("Hello from", "$(APP)")
+              }
+              EOF
+
+              cat > "$(workspaces.source.path)/Makefile" &lt;&lt; 'EOF'
+              test:
+              	go test ./...
+              build:
+              	go build -o dist/$(APP) ./src
+              EOF
+
+              echo "Reading config from workspace..."
+              cat "$(workspaces.config.path)/config.yaml"
+              echo ""
+              echo "Source tree:"
+              find "$(workspaces.source.path)" -type f
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Task 2: Read source from workspace and 'build' it
+    - name: build
+      runAfter:
+        - write-source
+      workspaces:
+        - name: source
+          workspace: source
+        - name: config
+          workspace: build-config
+        - name: credentials
+          workspace: registry-credentials
+      taskSpec:
+        workspaces:
+          - name: source
+          - name: config
+          - name: credentials
+            optional: true
+        params:
+          - name: app-name
+            type: string
+        results:
+          - name: artifact-path
+            description: "Path to the built artifact in the workspace"
+        steps:
+          - name: build-app
+            image: alpine:3.18
+            env:
+              - name: APP
+                value: "$(params.app-name)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "=== Build Stage ==="
+              echo "Reading source from: $(workspaces.source.path)"
+              echo ""
+              echo "Source files found:"
+              find "$(workspaces.source.path)" -type f
+              echo ""
+              echo "Build config:"
+              cat "$(workspaces.config.path)/config.yaml"
+              echo ""
+
+              # Simulate building
+              mkdir -p "$(workspaces.source.path)/dist"
+              echo "#!/bin/sh" &gt; "$(workspaces.source.path)/dist/$APP"
+              echo "echo 'I am $APP'" &gt;&gt; "$(workspaces.source.path)/dist/$APP"
+              chmod +x "$(workspaces.source.path)/dist/$APP"
+
+              ARTIFACT="$(workspaces.source.path)/dist/$APP"
+              echo "Built artifact: $ARTIFACT"
+              printf '%s' "$ARTIFACT" | tee "$(results.artifact-path.path)"
+              echo ""
+
+              # Check if credentials workspace was provided
+              if [ "$(workspaces.credentials.bound)" = "true" ]; then
+                echo "Registry credentials are available"
+                ls "$(workspaces.credentials.path)/"
+              else
+                echo "No registry credentials — skipping push (dry-run mode)"
+              fi
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Task 3: Verify the artifact exists in the workspace
+    - name: verify
+      runAfter:
+        - build
+      workspaces:
+        - name: source
+          workspace: source
+      taskSpec:
+        workspaces:
+          - name: source
+        steps:
+          - name: check-artifact
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "=== Verification ==="
+              echo "Checking workspace contents after build:"
+              find "$(workspaces.source.path)" -type f -exec ls -la {} +
+              echo ""
+              echo "All files persisted correctly across tasks!"
+              echo "This is the power of shared PVC workspaces."
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">04-pipelinerun.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: workspace-demo-run-001
+spec:
+  pipelineRef:
+    name: workspace-demo-pipeline
+  params:
+    - name: app-name
+      value: "myapp-v1"
+  # Bind the workspace slots to actual Kubernetes resources
+  workspaces:
+    - name: source
+      # Bind to our pre-created PVC
+      persistentVolumeClaim:
+        claimName: pipeline-workspace-pvc
+    - name: build-config
+      # Bind to our ConfigMap — mounted as files
+      configMap:
+        name: build-config
+    # NOTE: registry-credentials is optional, so omitting it is fine
+    # To include it you would add:
+    # - name: registry-credentials
+    #   secret:
+    #     secretName: registry-push-secret
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Apply storage resources
+kubectl apply -f 04-workspace-resources.yaml
+
+# Verify PVC was created (it will be Pending until a task claims it)
+kubectl get pvc pipeline-workspace-pvc
+
+# Apply the pipeline
+kubectl apply -f 04-workspace-pipeline.yaml
+
+# Start the pipeline run
+kubectl apply -f 04-pipelinerun.yaml
+
+# Follow logs across all tasks
+tkn pipelinerun logs workspace-demo-run-001 -f
+
+# Inspect workspace bindings in the PipelineRun spec
+kubectl get pipelinerun workspace-demo-run-001 -o yaml | grep -A 20 workspaces
+
+# After completion — PVC is still there with the built artifact
+kubectl get pvc pipeline-workspace-pvc
+
+# Show workspace types: emptyDir variant
+tkn pipeline start workspace-demo-pipeline \
+  --workspace name=source,emptyDir="" \
+  --workspace name=build-config,config=build-config \
+  --param app-name="emptydir-test" \
+  --showlog
+
+# Create a registry secret to demonstrate optional workspace binding
+kubectl create secret docker-registry registry-push-secret \
+  --docker-server=quay.io \
+  --docker-username=myuser \
+  --docker-password=mypassword</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>Workspaces are central to Konflux's pipeline design:</p>
+        <ul>
+          <li><strong>workspace</strong> (PVC) — all Konflux build tasks share this single PVC. The <code>clone-repository</code> task writes the full source tree here; <code>build-container</code> reads it.</li>
+          <li><strong>git-auth</strong> (Secret) — injected by Konflux with the credentials to clone private repositories. Your Task can read <code>$(workspaces.git-auth.path)/.git-credentials</code>.</li>
+          <li><strong>registry-auth</strong> (Secret) — Konflux mounts push credentials here so the Buildah task can push images without hardcoding any passwords.</li>
+          <li><strong>netrc</strong> (Secret, optional) — for private Go modules or npm registries in hermetic builds.</li>
+        </ul>
+        <p>When you see <code>workspaces.workspace.bound</code> checks in Konflux tasks, that's the optional workspace pattern you just learned.</p>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>Workspaces enable file sharing across Tasks in a Pipeline</li>
+        <li>PVC = persistent, shared; emptyDir = ephemeral, per-TaskRun</li>
+        <li>ConfigMap/Secret workspaces inject config as files</li>
+        <li>Pipeline binds workspace slots; PipelineRun provides actual values</li>
+        <li>Optional workspaces allow conditional feature activation</li>
+        <li>Always use <code>$(workspaces.name.path)</code> not hardcoded paths</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ VIDEO 5 ═══════════════════════════ -->
+<section class="video-section" id="video-5">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Triggers</span>
+      <div class="badges"><span class="badge intermediate">Intermediate</span><span class="badge duration">⏱ 32 min</span></div>
+    </div>
+    <h2>Tekton Triggers — Event-Driven Pipelines with GitHub Webhooks</h2>
+  </div>
+  <div class="video-body">
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">The three Trigger CRDs: EventListener, TriggerBinding, TriggerTemplate</div>
+        <div class="learn-item">How HTTP webhooks become PipelineRuns</div>
+        <div class="learn-item">Extracting values from webhook payloads with TriggerBinding</div>
+        <div class="learn-item">RBAC setup required for Triggers to create pipeline resources</div>
+        <div class="learn-item">Testing triggers locally with curl and ngrok</div>
+        <div class="learn-item">GitHub webhook configuration end-to-end</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Install Tekton Triggers</strong> — apply the release manifest, verify pods in <code>tekton-pipelines</code> namespace.</li>
+        <li><strong>Apply RBAC</strong> — ServiceAccount, Role, and RoleBinding from <code>05-triggers-rbac.yaml</code>.</li>
+        <li><strong>Apply TriggerBinding and TriggerTemplate</strong> — explain how payload fields map to template params.</li>
+        <li><strong>Apply EventListener</strong> — port-forward to reach it locally.</li>
+        <li><strong>Test with curl</strong> — simulate a GitHub push event payload and watch the PipelineRun get created automatically.</li>
+        <li><strong>Use ngrok</strong> to expose the EventListener, add webhook in GitHub settings, and push a real commit to trigger the pipeline.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">05-triggers-rbac.yaml</div>
+        <pre><code class="language-yaml">---
+# ServiceAccount used by the EventListener Pod
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-triggers-sa
+  namespace: default
+---
+# Role granting the SA permission to create pipeline resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tekton-triggers-role
+  namespace: default
+rules:
+  # Allow creating PipelineRuns
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelineruns", "taskruns"]
+    verbs: ["create", "get", "list", "watch"]
+  # Allow reading existing Pipelines and Tasks
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelines", "tasks"]
+    verbs: ["get", "list"]
+  # Allow creating PVCs for workspaces
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["create", "delete", "get", "list"]
+  # Allow reading Secrets (for webhook secret validation)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tekton-triggers-rolebinding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-sa
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tekton-triggers-role
+---
+# ClusterRole granting access to cluster-scoped Triggers resources.
+# ClusterInterceptors live at the cluster scope so a Role (namespace-only)
+# cannot grant access to them — a ClusterRole is required.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tekton-triggers-eventlistener-clusterrole
+rules:
+  - apiGroups: ["triggers.tekton.dev"]
+    resources:
+      - clusterinterceptors       # cluster-scoped — the key missing permission
+      - clustertriggerbindings
+      - eventlisteners
+      - triggerbindings
+      - triggertemplates
+      - triggers
+      - interceptors
+    verbs: ["get", "list", "watch"]
+---
+# Bind the EventListener SA to the ClusterRole above
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tekton-triggers-cluster-binding
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-sa
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tekton-triggers-eventlistener-clusterrole
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">05-triggerbinding.yaml</div>
+        <pre><code class="language-yaml">apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: github-push-binding
+spec:
+  params:
+    # Extract values from the GitHub push webhook JSON payload
+    - name: git-repo-url
+      value: $(body.repository.clone_url)
+    - name: git-repo-name
+      value: $(body.repository.name)
+    - name: git-revision
+      value: $(body.head_commit.id)
+    - name: git-ref
+      value: $(body.ref)
+    - name: pusher-name
+      value: $(body.pusher.name)
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">05-triggertemplate.yaml</div>
+        <pre><code class="language-yaml">apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: github-push-template
+spec:
+  # These params receive values from the TriggerBinding
+  params:
+    - name: git-repo-url
+      description: "URL of the repository that was pushed to"
+    - name: git-repo-name
+      description: "Short name of the repository"
+    - name: git-revision
+      description: "Commit SHA that was pushed"
+      default: "main"
+    - name: git-ref
+      description: "Git ref (branch or tag)"
+      default: "refs/heads/main"
+    - name: pusher-name
+      description: "GitHub username of who pushed"
+      default: "unknown"
+  resourcetemplates:
+    # This is the resource that gets created for each event
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        # generateName adds a random suffix for uniqueness
+        generateName: triggered-build-
+        labels:
+          triggers.tekton.dev/trigger: github-push
+          app.kubernetes.io/managed-by: tekton-triggers
+        annotations:
+          triggered-by: "$(tt.params.pusher-name)"
+          git-revision: "$(tt.params.git-revision)"
+      spec:
+        pipelineRef:
+          name: code-quality-pipeline
+        params:
+          - name: repo-url
+            value: "$(tt.params.git-repo-url)"
+          - name: revision
+            value: "$(tt.params.git-revision)"
+        # code-quality-pipeline (Video 3) has no workspace declarations,
+        # so no workspaces block is needed here.
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">05-eventlistener.yaml</div>
+        <pre><code class="language-yaml">apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-push-listener
+spec:
+  serviceAccountName: tekton-triggers-sa
+  triggers:
+    - name: github-push-trigger
+      # Interceptors run BEFORE the binding — they validate and filter events
+      interceptors:
+        - ref:
+            name: github
+            kind: ClusterInterceptor
+          params:
+            # Validate the webhook secret (set this in GitHub webhook settings)
+            - name: secretRef
+              value:
+                secretName: github-webhook-secret
+                secretKey: secret
+            # Only process push events (not PRs, issues, etc.)
+            - name: eventTypes
+              value:
+                - push
+        - ref:
+            name: cel
+            kind: ClusterInterceptor
+          params:
+            # CEL filter: only trigger for pushes to main branch
+            - name: filter
+              value: "body.ref == 'refs/heads/main'"
+            # CEL overlays: add computed values to the event context
+            - name: overlays
+              value:
+                - key: branch_name
+                  expression: "body.ref.split('/')[2]"
+      # Map the interceptor output to template params
+      bindings:
+        - ref: github-push-binding
+      template:
+        ref: github-push-template
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">05-webhook-secret.yaml  (create before applying EventListener)</div>
+        <pre><code class="language-yaml">apiVersion: v1
+kind: Secret
+metadata:
+  name: github-webhook-secret
+type: Opaque
+stringData:
+  # Use this same value in GitHub webhook settings → Secret field
+  secret: "my-super-secret-webhook-key-change-this"
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Install Tekton Triggers
+kubectl apply -f https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+kubectl apply -f https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
+
+# Wait for triggers components to be ready
+kubectl wait --for=condition=ready pod \
+  --selector=app=tekton-triggers-controller \
+  --namespace=tekton-pipelines \
+  --timeout=120s
+
+# Apply RBAC, secret, and trigger resources in order
+kubectl apply -f 05-webhook-secret.yaml
+kubectl apply -f 05-triggers-rbac.yaml
+kubectl apply -f 05-triggerbinding.yaml
+kubectl apply -f 05-triggertemplate.yaml
+kubectl apply -f 05-eventlistener.yaml
+
+# Verify EventListener pod is running
+kubectl get pods | grep el-github-push-listener
+kubectl get eventlistener github-push-listener
+
+# Port-forward the EventListener service for local testing
+kubectl port-forward svc/el-github-push-listener 8080:8080 &amp;
+
+# Simulate a GitHub push webhook with curl.
+# The GitHub interceptor validates the HMAC-SHA256 signature — it MUST match
+# the webhook secret. Compute it from the exact payload bytes before sending.
+
+PAYLOAD='{"ref":"refs/heads/main","head_commit":{"id":"abc123def456"},"repository":{"name":"my-repo","clone_url":"https://github.com/myorg/my-repo"},"pusher":{"name":"developer1"}}'
+SECRET="my-super-secret-webhook-key-change-this"
+SIG=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')
+
+curl -v -X POST http://localhost:8080 \
+  -H 'Content-Type: application/json' \
+  -H 'X-GitHub-Event: push' \
+  -H "X-Hub-Signature-256: sha256=${SIG}" \
+  -d "$PAYLOAD"
+
+# Watch the PipelineRun get created automatically
+kubectl get pipelineruns -w
+
+# For real GitHub integration — use ngrok to expose the service
+ngrok http 8080
+# Copy the https ngrok URL and add it in:
+# GitHub repo Settings > Webhooks > Add webhook
+# Payload URL: https://your-ngrok-url.ngrok.io
+# Content type: application/json
+# Secret: my-super-secret-webhook-key-change-this
+# Events: Just the push event</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>Konflux uses Tekton Triggers extensively but wraps them in a higher-level abstraction:</p>
+        <ul>
+          <li>Konflux has a <strong>PaC (Pipeline as Code)</strong> controller that registers webhooks on your repositories automatically when you add a Component</li>
+          <li>When you push code, GitHub calls Konflux's webhook receiver, which validates the event and creates a PipelineRun — exactly what our EventListener does here</li>
+          <li>The PaC controller handles the TriggerBinding/TriggerTemplate logic internally, extracting repo URL, commit SHA, and PR number from the webhook payload</li>
+          <li>Konflux also supports <code>.tekton/</code> directory in your repo where you can define pipeline customizations using Pipeline as Code syntax</li>
+          <li>Understanding Triggers is key to debugging why a push to your Component didn't trigger a build</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>EventListener = HTTP server that receives webhook events</li>
+        <li>TriggerBinding = extracts fields from the webhook payload</li>
+        <li>TriggerTemplate = defines what resources to create per event</li>
+        <li>Interceptors validate/filter events before processing</li>
+        <li>RBAC is required for the EventListener to create PipelineRuns</li>
+        <li>CEL expressions enable powerful event filtering logic</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ VIDEO 6 ═══════════════════════════ -->
+<section class="video-section" id="video-6">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Artifact Hub</span>
+      <div class="badges"><span class="badge intermediate">Intermediate</span><span class="badge duration">⏱ 30 min</span></div>
+    </div>
+    <h2>Artifact Hub &amp; Community Tasks — Building Real CI Without Starting from Scratch</h2>
+  </div>
+  <div class="video-body">
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">Why Tekton Hub is deprecated and how Artifact Hub replaces it</div>
+        <div class="learn-item">Browsing and installing community Tasks from <a href="https://artifacthub.io/packages/search?kind=7" target="_blank" rel="noopener">Artifact Hub</a></div>
+        <div class="learn-item">Using the <code>git-clone</code> catalog task correctly</div>
+        <div class="learn-item">Building container images with the <code>buildah</code> catalog task</div>
+        <div class="learn-item">Wiring catalog tasks into a coherent pipeline</div>
+        <div class="learn-item">Understanding resolver-based task references (http/git/bundle resolvers)</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Browse Artifact Hub</strong> — open <a href="https://artifacthub.io/packages/search?kind=7" target="_blank" rel="noopener">artifacthub.io/packages/search?kind=7</a>, find git-clone and buildah tasks, show the YAML and version list.</li>
+        <li><strong>Find tasks on Artifact Hub</strong> — open <a href="https://artifacthub.io/packages/search?kind=7" target="_blank" rel="noopener">artifacthub.io</a> and search for git-clone and buildah; show the Install tab with the raw GitHub URL.</li>
+        <li><strong>Create the pipeline</strong> that wires git-clone → buildah via the <code>http</code> resolver (no cluster installation needed).</li>
+        <li><strong>Create a container registry secret</strong> for pushing images.</li>
+        <li><strong>Run the pipeline</strong> against a sample public repository with a Containerfile.</li>
+        <li><strong>Show the bundle resolver approach</strong> as used by Konflux — task definitions fetched from OCI at runtime.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">06-registry-secret.yaml  (create your own credentials first)</div>
+        <pre><code class="language-yaml">---
+# The buildah catalog task mounts the dockerconfig workspace and looks for
+# a file named exactly "config.json" at the workspace root.
+#
+# DO NOT use "kubectl create secret docker-registry" — that command creates
+# a secret with the key ".dockerconfigjson", which buildah cannot find.
+#
+# CORRECT approach — key must be "config.json":
+#
+# Option A: reuse your local Docker / Podman login (simplest):
+#   kubectl create secret generic registry-credentials \
+#     --from-file=config.json=$HOME/.docker/config.json
+#
+# Option B: create from scratch for docker.io:
+#   AUTH=$(echo -n "YOUR_USERNAME:YOUR_TOKEN" | base64)
+#   kubectl create secret generic registry-credentials \
+#     --from-literal=config.json="{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$AUTH\"}}}"
+#
+# Option C: create from scratch for quay.io:
+#   AUTH=$(echo -n "YOUR_USERNAME:YOUR_TOKEN" | base64)
+#   kubectl create secret generic registry-credentials \
+#     --from-literal=config.json="{\"auths\":{\"quay.io\":{\"auth\":\"$AUTH\"}}}"
+#
+# The YAML structure for reference (apply after base64-encoding config.json):
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-credentials
+type: Opaque
+data:
+  # base64 of the full config.json contents (NOT the dockerconfigjson format)
+  config.json: BASE64_OF_CONFIG_JSON_HERE
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">06-ci-pipeline-catalog.yaml  (uses catalog tasks via http resolver — no hub install needed)</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: container-ci-pipeline
+  annotations:
+    tekton.dev/displayName: "Container CI Pipeline"
+    tekton.dev/description: "Clone, build, and push a container image using catalog tasks"
+spec:
+  params:
+    - name: git-url
+      type: string
+      description: "Repository URL to clone and build"
+    - name: git-revision
+      type: string
+      default: ""   # empty = HEAD of default branch (works for main, master, etc.)
+    - name: image-name
+      type: string
+      description: "Target image (e.g. quay.io/myorg/myapp)"
+    - name: dockerfile-path
+      type: string
+      default: "./Dockerfile"
+      description: "Path to the Dockerfile relative to repo root"
+    - name: context-path
+      type: string
+      default: "."
+      description: "Build context path"
+  results:
+    - name: image-url
+      description: "Full URL of the pushed image"
+      value: "$(tasks.build-image.results.IMAGE_URL)"
+    - name: image-digest
+      description: "SHA256 digest of the pushed image"
+      value: "$(tasks.build-image.results.IMAGE_DIGEST)"
+    - name: git-commit
+      description: "Exact commit SHA that was built"
+      value: "$(tasks.clone-repo.results.commit)"
+  workspaces:
+    - name: source
+      description: "Shared workspace: source code lives here"
+    - name: registry-auth
+      description: "Docker config secret for registry authentication"
+  tasks:
+    # TASK 1: Clone the repository
+    - name: clone-repo
+      taskRef:
+        # Use the resolver to reference the catalog task directly
+        # No kubectl apply needed — Tekton fetches it from the catalog
+        resolver: http
+        params:
+          - name: url
+            value: https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.9/git-clone.yaml
+      params:
+        - name: url
+          value: "$(params.git-url)"
+        - name: revision
+          value: "$(params.git-revision)"
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: source
+
+    # TASK 2: Build and push the container image with Buildah
+    - name: build-image
+      runAfter:
+        - clone-repo
+      taskRef:
+        resolver: http
+        params:
+          - name: url
+            value: https://raw.githubusercontent.com/tektoncd/catalog/main/task/buildah/0.7/buildah.yaml
+      params:
+        - name: IMAGE
+          value: "$(params.image-name):$(tasks.clone-repo.results.commit)"
+        - name: DOCKERFILE
+          value: "$(params.dockerfile-path)"
+        - name: CONTEXT
+          value: "$(params.context-path)"
+        - name: TLSVERIFY
+          value: "false"
+        - name: FORMAT
+          value: "oci"
+      workspaces:
+        - name: source
+          workspace: source
+        - name: dockerconfig
+          workspace: registry-auth
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">06-pipeline-pvc.yaml</div>
+        <pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ci-pipeline-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">06-pipelinerun.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: container-ci-run-001
+spec:
+  pipelineRef:
+    name: container-ci-pipeline
+  params:
+    # traefik/whoami — tiny Go HTTP server, minimal self-contained Dockerfile,
+    # no external dependencies, builds in seconds. Good demo target.
+    # Swap git-url for your own application repo when ready.
+    # git-revision is left empty so git-clone uses HEAD of the default branch
+    # automatically — works whether the repo uses main, master, or anything else.
+    - name: git-url
+      value: "https://github.com/traefik/whoami"
+    - name: git-revision
+      value: ""
+    # Replace with your own registry + image name
+    - name: image-name
+      value: "quay.io/YOURORG/whoami-demo"
+    - name: dockerfile-path
+      value: "./Dockerfile"
+    - name: context-path
+      value: "."
+  workspaces:
+    - name: source
+      persistentVolumeClaim:
+        claimName: ci-pipeline-pvc
+    - name: registry-auth
+      secret:
+        secretName: registry-credentials
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># ── Tekton Hub is fully deprecated — tkn hub commands do NOT work ──
+# The hub.tekton.dev API is offline. The tkn hub CLI has no working
+# replacement for search/install yet. Use one of these two approaches:
+
+# ── OPTION A: Browse Artifact Hub in your browser ───────────────
+# https://artifacthub.io/packages/search?kind=7
+# Find a task, click it, copy the raw GitHub YAML URL from the Install tab.
+
+# ── OPTION B (preferred): Apply task YAML directly from GitHub ───
+# No hub needed — point kubectl at the raw file in tektoncd/catalog.
+kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.9/git-clone.yaml
+kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/buildah/0.7/buildah.yaml
+
+# Verify tasks landed in the cluster
+tkn task list
+tkn task describe git-clone   # shows params, workspaces, results
+
+# ── OPTION C (most modern): http resolver — zero installation ────
+# The pipeline in 06-ci-pipeline-catalog.yaml already uses this.
+# Tekton fetches the task YAML from GitHub at runtime per PipelineRun,
+# so you never need to kubectl apply the tasks at all.
+
+# Create the PVC
+kubectl apply -f 06-pipeline-pvc.yaml
+
+# Create registry credentials.
+# IMPORTANT: buildah looks for a file named "config.json" at the workspace
+# root — NOT ".dockerconfigjson". Use "kubectl create secret generic" with
+# --from-file=config.json, NOT "kubectl create secret docker-registry".
+
+# Option A — reuse an existing local Docker/Podman login (simplest):
+kubectl create secret generic registry-credentials \
+  --from-file=config.json=$HOME/.docker/config.json
+
+# Option B — create inline for docker.io (replace USER and TOKEN):
+AUTH=$(echo -n "YOUR_USERNAME:YOUR_TOKEN" | base64)
+kubectl create secret generic registry-credentials \
+  --from-literal=config.json="{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$AUTH\"}}}"
+
+# Option C — create inline for quay.io:
+AUTH=$(echo -n "YOUR_USERNAME:YOUR_TOKEN" | base64)
+kubectl create secret generic registry-credentials \
+  --from-literal=config.json="{\"auths\":{\"quay.io\":{\"auth\":\"$AUTH\"}}}"
+
+# Apply and run the pipeline
+kubectl apply -f 06-ci-pipeline-catalog.yaml
+kubectl apply -f 06-pipelinerun.yaml
+
+# Follow the logs
+tkn pipelinerun logs container-ci-run-001 -f
+
+# When complete, check the results (image URL and digest)
+tkn pipelinerun describe container-ci-run-001</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>The Konflux build pipeline is a more sophisticated version of exactly this pattern:</p>
+        <ul>
+          <li>Konflux uses <strong>OCI bundle references</strong> for all its tasks: <code>quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1</code></li>
+          <li>The <strong>bundle resolver</strong> fetches the task definition from OCI at runtime — no installation needed, and you get full immutability via digest pinning</li>
+          <li>Konflux's <code>build-container</code> task uses Buildah exactly like this demo, with the same IMAGE, DOCKERFILE, and CONTEXT params</li>
+          <li>The <code>IMAGE_DIGEST</code> result from <code>build-container</code> is the lynchpin of the whole supply chain: it flows into Tekton Chains for signing, into the vulnerability scanner, and eventually into the Konflux Snapshot</li>
+          <li>To see real Konflux task definitions: <code>oc get task -n konflux-ci</code> or browse the Konflux tekton-catalog repository</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>Tekton Hub is fully deprecated — use <a href="https://artifacthub.io/packages/search?kind=7" target="_blank" rel="noopener">Artifact Hub</a> or direct GitHub URLs</li>
+        <li><code>kubectl apply -f &lt;raw-github-url&gt;</code> is the reliable way to install catalog tasks</li>
+        <li>Resolvers (http, git, bundle) fetch tasks at runtime — no cluster install needed</li>
+        <li>git-clone produces a <code>commit</code> result — tag images with it</li>
+        <li>Buildah is daemonless and preferred for Kubernetes-native builds</li>
+        <li>Pin task versions for reproducible pipelines</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ VIDEO 7 ═══════════════════════════ -->
+<section class="video-section" id="video-7">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Advanced Patterns</span>
+      <div class="badges"><span class="badge advanced">Advanced</span><span class="badge duration">⏱ 35 min</span></div>
+    </div>
+    <h2>Advanced Pipeline Patterns — When, Finally, Matrix, and Embedded Tasks</h2>
+  </div>
+  <div class="video-body">
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item"><code>when</code> expressions for conditional task execution</div>
+        <div class="learn-item"><code>finally</code> block for guaranteed cleanup and notifications</div>
+        <div class="learn-item"><code>matrix</code> for fan-out parallel execution over a list</div>
+        <div class="learn-item">Inline <code>taskSpec</code> vs external <code>taskRef</code></div>
+        <div class="learn-item">Accessing pipeline run status in finally tasks</div>
+        <div class="learn-item">timeout and retry fields on pipeline tasks</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Build the advanced pipeline</strong> step by step — start with just the main tasks, then add <code>when</code> conditions.</li>
+        <li><strong>Run with skip-tests=true</strong> — show that the test task is skipped but all others run.</li>
+        <li><strong>Add the finally block</strong> — show it running even when a task fails.</li>
+        <li><strong>Add matrix</strong> — show three parallel TaskRuns being created from one pipeline task definition.</li>
+        <li><strong>Add retries and timeout</strong> — demonstrate a flaky task being retried automatically.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">07-advanced-pipeline.yaml</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: advanced-patterns-pipeline
+spec:
+  params:
+    - name: skip-tests
+      type: string
+      default: "false"
+      description: "Set to 'true' to skip the test stage (use with caution)"
+    - name: run-security-scan
+      type: string
+      default: "true"
+      description: "Set to 'false' to skip security scanning"
+    - name: platforms
+      type: array
+      default:
+        - "linux/amd64"
+        - "linux/arm64"
+      description: "List of platforms to build for"
+    - name: app-name
+      type: string
+      default: "myapp"
+
+  workspaces:
+    - name: source
+
+  tasks:
+    # Always runs — validates configuration
+    - name: validate
+      taskSpec:
+        steps:
+          - name: check
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Validating pipeline configuration..."
+              echo "App: $(params.app-name)"
+              echo "Skip tests: $(params.skip-tests)"
+              echo "Validation passed."
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+        - name: skip-tests
+          value: "$(params.skip-tests)"
+
+    # Conditional: only runs if skip-tests != "true"
+    - name: run-tests
+      runAfter:
+        - validate
+      when:
+        - input: "$(params.skip-tests)"
+          operator: in
+          values: ["false", "False", "FALSE", ""]
+      taskSpec:
+        params:
+          - name: app-name
+        steps:
+          - name: test
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Running unit tests for $(params.app-name)..."
+              sleep 3
+              echo "42 tests passed, 0 failed."
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Matrix: builds for each platform in parallel
+    # One TaskRun is created per platform value
+    - name: build-multiarch
+      runAfter:
+        - validate
+      matrix:
+        params:
+          - name: platform
+            value:
+              - "$(params.platforms[0])"
+              - "$(params.platforms[1])"
+      taskSpec:
+        params:
+          - name: platform
+            type: string
+          - name: app-name
+            type: string
+        results:
+          - name: build-status
+        steps:
+          - name: build-for-platform
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              PLATFORM="$(params.platform)"
+              APP="$(params.app-name)"
+              echo "Building $APP for platform: $PLATFORM"
+              sleep 4
+              echo "Build complete for $PLATFORM"
+              printf '%s' "success-$PLATFORM" | tee "$(results.build-status.path)"
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+    # Conditional: skip if run-security-scan is false
+    # Also uses retry — will retry up to 2 times on failure
+    - name: security-scan
+      runAfter:
+        - build-multiarch
+      when:
+        - input: "$(params.run-security-scan)"
+          operator: in
+          values: ["true", "True", "TRUE"]
+      retries: 2
+      timeout: "10m"
+      taskSpec:
+        params:
+          - name: app-name
+        steps:
+          - name: scan
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Running security scan on $(params.app-name)..."
+              sleep 2
+              echo "Scan complete. No critical vulnerabilities found."
+      params:
+        - name: app-name
+          value: "$(params.app-name)"
+
+  # FINALLY block — always executes, even if above tasks fail
+  finally:
+    - name: notify-result
+      taskSpec:
+        params:
+          - name: pipeline-run-name
+            type: string
+        steps:
+          - name: send-notification
+            image: alpine:3.18
+            env:
+              - name: PIPELINERUN_NAME
+                value: "$(params.pipeline-run-name)"
+            script: |
+              #!/bin/sh
+              echo "=== Pipeline Completion Notification ==="
+              echo "PipelineRun: $PIPELINERUN_NAME"
+              echo "Namespace: $(context.pipelineRun.namespace)"
+              echo ""
+              # In a real pipeline this would call a Slack webhook or
+              # post a GitHub status comment
+              echo "Status: Pipeline finished (check PipelineRun for final status)"
+              echo "Timestamp: $(date -u)"
+              echo "This finally task always runs, regardless of success or failure."
+      params:
+        - name: pipeline-run-name
+          value: "$(context.pipelineRun.name)"
+
+    # Cleanup: delete temporary resources
+    - name: cleanup-workspace
+      taskSpec:
+        steps:
+          - name: cleanup
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "Cleaning up temporary files..."
+              echo "In a real pipeline: rm -rf /workspace/source/tmp"
+              echo "Or delete temporary PVCs, ConfigMaps, etc."
+              echo "Cleanup complete."
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">07-pipelinerun-skip-tests.yaml  (demonstrate when expression)</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: advanced-run-skip-tests
+spec:
+  pipelineRef:
+    name: advanced-patterns-pipeline
+  params:
+    - name: app-name
+      value: "demo-app"
+    - name: skip-tests
+      # This will cause the run-tests task to be SKIPPED (not failed)
+      value: "true"
+    - name: run-security-scan
+      value: "true"
+    - name: platforms
+      value:
+        - "linux/amd64"
+        - "linux/arm64"
+  workspaces:
+    - name: source
+      emptyDir: {}
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Apply the pipeline
+kubectl apply -f 07-advanced-pipeline.yaml
+
+# Run 1: Normal run (all tasks execute)
+tkn pipeline start advanced-patterns-pipeline \
+  --param app-name="myapp" \
+  --param skip-tests="false" \
+  --param run-security-scan="true" \
+  --workspace name=source,emptyDir="" \
+  --showlog
+
+# Run 2: Skip tests using when expression
+kubectl apply -f 07-pipelinerun-skip-tests.yaml
+tkn pipelinerun logs advanced-run-skip-tests -f
+
+# After run — see which tasks were SKIPPED vs COMPLETED
+tkn pipelinerun describe advanced-run-skip-tests
+
+# See that finally tasks ran even if main tasks are in any state
+kubectl get taskruns --selector=tekton.dev/pipelineRun=advanced-run-skip-tests
+
+# Test retry behavior — temporarily break a task to see retries
+# Edit the pipeline, change security-scan to exit 1, apply, run again
+
+# Check matrix TaskRuns (one per platform)
+kubectl get taskruns --selector=tekton.dev/pipelineTask=build-multiarch</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <ul>
+          <li><strong>when expressions</strong>: Konflux uses these extensively. The <code>skip-checks</code> param in Konflux pipelines skips non-critical scanning tasks. SAST and ClamAV tasks have <code>when</code> guards based on component type and configuration.</li>
+          <li><strong>finally</strong>: Konflux's finally block contains tasks that upload SBOM data and post the pipeline run result back to the Konflux API — regardless of whether the build succeeded.</li>
+          <li><strong>matrix</strong>: Multi-arch Konflux builds use matrix to invoke Buildah for each target platform, then merge the manifests into a multi-arch manifest list.</li>
+          <li><strong>retries</strong>: Konflux sets <code>retries: 0</code> on most tasks — failures are intentionally surfaced immediately. The exception is tasks that call external services (like SBOM upload) which may have <code>retries: 3</code>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li><code>when</code> skips tasks conditionally — it's not a failure</li>
+        <li><code>finally</code> always runs — use for cleanup and notifications</li>
+        <li><code>matrix</code> fans out one task over a list in parallel</li>
+        <li><code>retries</code> automatically re-runs a failed task N times</li>
+        <li><code>timeout</code> kills a runaway task after a duration</li>
+        <li>Finally tasks can read <code>$(context.pipelineRun.name)</code> and namespace</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ VIDEO 8 ═══════════════════════════ -->
+<section class="video-section" id="video-8">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Chains &amp; Security</span>
+      <div class="badges"><span class="badge advanced">Advanced</span><span class="badge duration">⏱ 30 min</span></div>
+    </div>
+    <h2>Tekton Chains — Supply Chain Security, SLSA Attestations &amp; Image Signing</h2>
+  </div>
+  <div class="video-body">
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">What SLSA is and why supply chain security matters</div>
+        <div class="learn-item">How Tekton Chains works as a passive observer of TaskRuns</div>
+        <div class="learn-item">Installing and configuring Tekton Chains</div>
+        <div class="learn-item">Generating a cosign key pair for image signing</div>
+        <div class="learn-item">Verifying image signatures and SLSA attestations</div>
+        <div class="learn-item">How Konflux uses Chains for SLSA Level 3 compliance</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Install Tekton Chains</strong> — apply the release manifest, verify the controller pod.</li>
+        <li><strong>Generate a cosign key pair</strong> with <code>cosign generate-key-pair k8s://tekton-chains/signing-secrets</code>.</li>
+        <li><strong>Configure Chains</strong> — patch the chains-config ConfigMap to set storage backend and signing format.</li>
+        <li><strong>Run a build pipeline</strong> — use the pipeline from Video 6 to build and push a real image.</li>
+        <li><strong>Watch Chains process the TaskRun</strong> — show the <code>chains.tekton.dev/signed</code> annotation appearing.</li>
+        <li><strong>Verify the signature</strong> with <code>cosign verify</code> and inspect the attestation with <code>cosign verify-attestation</code>.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">08-chains-config.yaml  (patch the chains-config ConfigMap)</div>
+        <pre><code class="language-yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chains-config
+  namespace: tekton-chains
+data:
+  # Where to store the signed attestations.
+  # "oci" attaches them as OCI referrers alongside the image (recommended).
+  artifacts.oci.storage: "oci"
+  artifacts.taskrun.storage: "oci"
+  artifacts.pipelinerun.storage: "oci"
+
+  # Signing format for OCI images.
+  # artifacts.oci.format ONLY accepts "simplesigning" — it is an image signing
+  # format, not an attestation format. "slsa/v1" is invalid here and will crash
+  # the Chains controller on startup.
+  artifacts.oci.format: "simplesigning"
+
+  # Attestation format for TaskRun and PipelineRun provenance documents.
+  # "in-toto" is supported across all current Chains versions.
+  # "slsa/v1" requires Chains v0.21+ — use "in-toto" for broad compatibility.
+  artifacts.taskrun.format: "in-toto"
+  artifacts.pipelinerun.format: "in-toto"
+
+  # Transparency log — set to false for local/air-gapped dev clusters.
+  # Set to true in production to publish to the Sigstore Rekor public log.
+  transparency.enabled: "false"
+  transparency.url: "https://rekor.sigstore.dev"
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">08-signing-pipeline.yaml  (a Task that emits IMAGE_URL and IMAGE_DIGEST results so Chains can pick them up)</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: simulate-build-and-push
+  annotations:
+    # Tell Chains which results contain the image coordinates
+    chains.tekton.dev/output-image-name: IMAGE_URL
+    chains.tekton.dev/output-image-digest: IMAGE_DIGEST
+spec:
+  description: |
+    Simulates building and pushing a container image.
+    In a real pipeline this would be the Buildah task.
+    Chains watches for the IMAGE_URL and IMAGE_DIGEST results.
+  params:
+    - name: image-name
+      type: string
+      description: "Full image reference including tag (e.g. quay.io/org/app:v1.0)"
+  results:
+    # Chains REQUIRES these specific result names to detect the image
+    - name: IMAGE_URL
+      description: "The full URL of the built image"
+    - name: IMAGE_DIGEST
+      description: "The SHA256 digest of the pushed image (sha256:...)"
+  steps:
+    - name: build-and-push
+      image: alpine:3.18
+      env:
+        - name: IMAGE
+          value: "$(params.image-name)"
+      script: |
+        #!/bin/sh
+        set -e
+        echo "=== Simulating Build &amp; Push ==="
+        echo "Image: $IMAGE"
+        echo "Simulating Buildah build..."
+        sleep 2
+
+        # In a real scenario, the registry returns this digest after push
+        # Here we simulate a plausible digest
+        DIGEST="sha256:$(echo $IMAGE | md5sum | head -c 64)"
+
+        echo "Image built and pushed successfully!"
+        echo "Image URL:    $IMAGE"
+        echo "Image Digest: $DIGEST"
+
+        # Write results — Chains reads these after the TaskRun completes
+        printf '%s' "$IMAGE"  | tee "$(results.IMAGE_URL.path)"
+        printf '%s' "$DIGEST" | tee "$(results.IMAGE_DIGEST.path)"
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Install Tekton Chains
+kubectl apply -f https://storage.googleapis.com/tekton-releases/chains/latest/release.yaml
+
+# Wait for Chains controller to be ready
+kubectl wait --for=condition=ready pod \
+  --selector=app=tekton-chains-controller \
+  --namespace=tekton-chains \
+  --timeout=120s
+
+# Install cosign
+brew install cosign  # macOS
+# or: go install github.com/sigstore/cosign/cmd/cosign@latest
+
+# Generate a cosign key pair, stored directly in Kubernetes as a Secret
+cosign generate-key-pair k8s://tekton-chains/signing-secrets
+
+# The public key is in cosign.pub (save this for verification)
+# The private key is in the 'signing-secrets' Secret in tekton-chains namespace
+
+# Configure Chains
+kubectl apply -f 08-chains-config.yaml
+
+# Restart Chains to pick up the new config
+kubectl rollout restart deployment tekton-chains-controller -n tekton-chains
+
+# Apply and run the signing task
+kubectl apply -f 08-signing-pipeline.yaml
+tkn task start simulate-build-and-push \
+  --param image-name="quay.io/myorg/myapp:v1.0" \
+  --showlog
+
+# Watch for Chains to annotate the TaskRun (may take 30-60 seconds)
+kubectl get taskruns --watch
+# Look for: chains.tekton.dev/signed: "true"
+
+# Once signed, verify the image signature
+cosign verify --key cosign.pub quay.io/myorg/myapp:v1.0
+
+# Verify and inspect the SLSA attestation
+cosign verify-attestation \
+  --key cosign.pub \
+  --type slsaprovenance \
+  quay.io/myorg/myapp:v1.0 | jq .
+
+# The attestation contains:
+# - builder.id (your Tekton pipeline)
+# - invocation.parameters (what params were used)
+# - materials (the git repo and commit SHA)
+# - buildType (tekton.dev/v1/TaskRun)</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>Tekton Chains is <strong>central to Konflux's security model</strong>:</p>
+        <ul>
+          <li>Every Konflux build automatically gets SLSA Level 3 provenance — Chains signs the image and attestation with the cluster's signing key</li>
+          <li>Konflux uses <strong>Sigstore</strong> transparency log (Rekor) to make all attestations publicly auditable</li>
+          <li>The <code>IMAGE_DIGEST</code> result from Buildah is precisely what Chains uses to create the attestation — this is why that result is non-negotiable in any Konflux-compatible task</li>
+          <li>Enterprise Contract (EC) — another Konflux component — reads the Chains-generated attestations to enforce organizational policies before an image can be deployed</li>
+          <li>You can view the attestation for any Konflux-built image: <code>cosign verify-attestation --certificate-identity-regexp ".*" --certificate-oidc-issuer "https://token.actions.githubusercontent.com" IMAGE</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>Chains is a passive observer — zero pipeline changes needed</li>
+        <li>It signs images &amp; generates SLSA attestations automatically</li>
+        <li>Results named <code>IMAGE_URL</code> and <code>IMAGE_DIGEST</code> are the trigger</li>
+        <li>Attestations are stored as OCI artifacts — no separate DB</li>
+        <li><code>cosign verify</code> and <code>cosign verify-attestation</code> for validation</li>
+        <li>Foundation for SLSA Level 3 — what Konflux achieves in prod</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ VIDEO 9 ═══════════════════════════ -->
+<section class="video-section" id="video-9">
+  <div class="video-header">
+    <div class="video-header-top">
+      <span class="video-num">Container Build Pipeline</span>
+      <div class="badges"><span class="badge advanced">Advanced</span><span class="badge duration">⏱ 40 min</span></div>
+    </div>
+    <h2>Container Build Pipeline End-to-End — Clone, Test, Build, Scan, Sign, Push</h2>
+  </div>
+  <div class="video-body">
+    <div class="section-block">
+      <h3>What You'll Learn</h3>
+      <div class="learn-grid">
+        <div class="learn-item">Compose everything from Videos 1–8 into one production pipeline</div>
+        <div class="learn-item">The correct task ordering for a secure CI/CD pipeline</div>
+        <div class="learn-item">SBOM generation as part of the build</div>
+        <div class="learn-item">Vulnerability scanning with Trivy before pushing</div>
+        <div class="learn-item">Pipeline as Code — storing pipeline definitions in the repo</div>
+        <div class="learn-item">Parameterization for reuse across multiple applications</div>
+      </div>
+    </div>
+
+    
+    <div class="section-block steps">
+      <h3>Demo Steps</h3>
+      <ol>
+        <li><strong>Create a sample application repo</strong> with a Go or Python app and a Containerfile.</li>
+        <li><strong>Apply the full pipeline</strong> — walk through each task and explain why it's in that position.</li>
+        <li><strong>Run it end-to-end</strong> against the sample repo and follow logs task by task.</li>
+        <li><strong>Show the Dashboard</strong> — demonstrate the full DAG with parallel and sequential tasks.</li>
+        <li><strong>Introduce the .tekton directory</strong> approach — show how to store the pipeline in the repo.</li>
+        <li><strong>Trigger via webhook</strong> using the Trigger setup from Video 5.</li>
+      </ol>
+    </div>
+
+    <div class="section-block">
+      <h3>YAML Files</h3>
+
+      <div class="code-file">
+        <div class="code-filename">09-production-pipeline.yaml  (full reference pipeline)</div>
+        <pre><code class="language-yaml">apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: production-container-pipeline
+  annotations:
+    tekton.dev/displayName: "Production Container CI Pipeline"
+    tekton.dev/description: |
+      Full CI pipeline: clone, test, build, scan, sign.
+      Mirrors the structure of Konflux's default build pipeline.
+spec:
+  params:
+    - name: git-url
+      type: string
+      description: "Repository URL"
+    - name: git-revision
+      type: string
+      default: "main"
+    - name: image-name
+      type: string
+      description: "Target image, e.g. quay.io/myorg/myapp"
+    - name: dockerfile-path
+      type: string
+      default: "./Containerfile"
+    - name: skip-tests
+      type: string
+      default: "false"
+    - name: skip-vuln-scan
+      type: string
+      default: "false"
+
+  results:
+    - name: image-url
+      value: "$(tasks.build-container.results.IMAGE_URL)"
+    - name: image-digest
+      value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+    - name: git-commit
+      value: "$(tasks.clone-repository.results.commit)"
+
+  workspaces:
+    - name: source
+      description: "Shared workspace — source code and build artifacts"
+    - name: registry-auth
+      description: "Container registry credentials (docker config secret)"
+    # Uncomment for private repositories — mount a Secret with .git-credentials
+    # or SSH keys so git-clone can authenticate.
+    # - name: git-auth
+    #   description: "Git credentials for private repos (optional)"
+    #   optional: true
+
+  tasks:
+    # ── Stage 1: Clone ─────────────────────────────────────────────
+    - name: clone-repository
+      taskRef:
+        resolver: http
+        params:
+          - name: url
+            value: https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.9/git-clone.yaml
+      params:
+        - name: url
+          value: "$(params.git-url)"
+        - name: revision
+          value: "$(params.git-revision)"
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: source
+        # Uncomment for private repositories — maps the pipeline's git-auth
+        # workspace slot to the git-clone task's basic-auth workspace.
+        # - name: basic-auth
+        #   workspace: git-auth
+
+    # ── Stage 2: Test (skippable) ──────────────────────────────────
+    - name: run-unit-tests
+      runAfter:
+        - clone-repository
+      when:
+        - input: "$(params.skip-tests)"
+          operator: in
+          values: ["false", ""]
+      taskSpec:
+        workspaces:
+          - name: source
+        params:
+          - name: commit
+            type: string
+        steps:
+          - name: test
+            image: golang:1.24-alpine
+            workingDir: "$(workspaces.source.path)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "Running unit tests at commit: $(params.commit)"
+              # Detect project type
+              if [ -f go.mod ]; then
+                go test ./... -v -count=1
+              elif [ -f package.json ]; then
+                npm test
+              elif [ -f requirements.txt ]; then
+                pip install -r requirements.txt
+                python -m pytest
+              else
+                echo "No recognized test runner — skipping"
+              fi
+      params:
+        - name: commit
+          value: "$(tasks.clone-repository.results.commit)"
+      workspaces:
+        - name: source
+          workspace: source
+
+    # ── Stage 3: Build Container Image ────────────────────────────
+    - name: build-container
+      runAfter:
+        - run-unit-tests
+      taskSpec:
+        params:
+          - name: image
+            type: string
+          - name: dockerfile
+            type: string
+          - name: commit
+            type: string
+        results:
+          - name: IMAGE_URL
+            description: "Full image URL with tag"
+          - name: IMAGE_DIGEST
+            description: "SHA256 digest of pushed image"
+        workspaces:
+          - name: source
+          - name: registry-auth
+        steps:
+          - name: build-and-push
+            image: quay.io/buildah/stable:latest
+            securityContext:
+              privileged: true
+            env:
+              - name: IMAGE
+                value: "$(params.image):$(params.commit)"
+              - name: DOCKERFILE
+                value: "$(params.dockerfile)"
+              - name: DOCKERCONFIG
+                value: "$(workspaces.registry-auth.path)/config.json"
+            workingDir: "$(workspaces.source.path)"
+            script: |
+              #!/bin/bash
+              set -euo pipefail
+              export REGISTRY_AUTH_FILE="$DOCKERCONFIG"
+
+              echo "Building image: $IMAGE"
+              buildah build \
+                --file "$DOCKERFILE" \
+                --format oci \
+                --tag "$IMAGE" \
+                .
+
+              echo "Pushing image to registry..."
+              buildah push \
+                --digestfile /tmp/image-digest \
+                "$IMAGE"
+
+              DIGEST=$(cat /tmp/image-digest)
+              echo "Image pushed successfully"
+              echo "URL:    $IMAGE"
+              echo "Digest: $DIGEST"
+
+              printf '%s' "$IMAGE"  | tee "$(results.IMAGE_URL.path)"
+              printf '%s' "$DIGEST" | tee "$(results.IMAGE_DIGEST.path)"
+      params:
+        - name: image
+          value: "$(params.image-name)"
+        - name: dockerfile
+          value: "$(params.dockerfile-path)"
+        - name: commit
+          value: "$(tasks.clone-repository.results.commit)"
+      workspaces:
+        - name: source
+          workspace: source
+        - name: registry-auth
+          workspace: registry-auth
+
+    # ── Stage 4a: Vulnerability Scan (skippable) ──────────────────
+    - name: vulnerability-scan
+      runAfter:
+        - build-container
+      when:
+        - input: "$(params.skip-vuln-scan)"
+          operator: in
+          values: ["false", ""]
+      taskSpec:
+        params:
+          - name: image-url
+          - name: image-digest
+        steps:
+          - name: trivy-scan
+            image: aquasec/trivy:latest
+            env:
+              - name: TRIVY_NO_PROGRESS
+                value: "true"
+              - name: TRIVY_EXIT_CODE
+                value: "1"
+              - name: TRIVY_SEVERITY
+                value: "CRITICAL"
+            script: |
+              #!/bin/sh
+              IMAGE="$(params.image-url)@$(params.image-digest)"
+              echo "Scanning image: $IMAGE"
+              trivy image \
+                --exit-code "$TRIVY_EXIT_CODE" \
+                --severity "$TRIVY_SEVERITY" \
+                --format table \
+                "$IMAGE"
+      params:
+        - name: image-url
+          value: "$(tasks.build-container.results.IMAGE_URL)"
+        - name: image-digest
+          value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+
+    # ── Stage 4b: Generate SBOM ────────────────────────────────────
+    - name: generate-sbom
+      runAfter:
+        - build-container
+      taskSpec:
+        params:
+          - name: image-url
+          - name: image-digest
+        workspaces:
+          - name: source
+        steps:
+          - name: syft-sbom
+            # anchore/syft:latest is distroless — no shell, so Tekton cannot
+            # inject its script file. Use alpine and install the syft binary.
+            image: alpine:3.18
+            env:
+              - name: IMAGE
+                value: "$(params.image-url)@$(params.image-digest)"
+            workingDir: "$(workspaces.source.path)"
+            script: |
+              #!/bin/sh
+              set -e
+              echo "Installing syft..."
+              apk add --no-cache curl ca-certificates
+              curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh \
+                | sh -s -- -b /usr/local/bin
+              echo "Generating SBOM for: $IMAGE"
+              syft "$IMAGE" -o cyclonedx-json > sbom.json
+              echo "SBOM generated: $(wc -l < sbom.json) lines"
+              echo "Top components:"
+              head -50 sbom.json
+      params:
+        - name: image-url
+          value: "$(tasks.build-container.results.IMAGE_URL)"
+        - name: image-digest
+          value: "$(tasks.build-container.results.IMAGE_DIGEST)"
+      workspaces:
+        - name: source
+          workspace: source
+
+  # ── Finally: Always runs ─────────────────────────────────────────
+  finally:
+    - name: pipeline-notification
+      taskSpec:
+        params:
+          - name: image-url
+            default: "unknown"
+          - name: run-name
+        steps:
+          - name: notify
+            image: alpine:3.18
+            script: |
+              #!/bin/sh
+              echo "========================================"
+              echo " Pipeline Complete"
+              echo " Run:   $(params.run-name)"
+              echo " Image: $(params.image-url)"
+              echo " Time:  $(date -u)"
+              echo "========================================"
+              # In production: curl -X POST SLACK_WEBHOOK -d "{...}"
+      params:
+        - name: run-name
+          value: "$(context.pipelineRun.name)"
+        - name: image-url
+          value: "$(tasks.build-container.results.IMAGE_URL)"
+</code></pre>
+      </div>
+
+      <div class="code-file">
+        <div class="code-filename">.tekton/push.yaml  (Pipeline as Code — stored in your app repo)</div>
+        <pre><code class="language-yaml"># Store this file at .tekton/push.yaml in your application repository.
+# Tekton PaC (Pipeline as Code) detects it and runs it on every push.
+#
+# Annotations control WHEN this pipeline runs:
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: push-build
+  annotations:
+    # PaC annotation: trigger on push to main
+    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-target-branch: "[main, release-*]"
+    # Maximum number of concurrent runs for this pipeline
+    pipelinesascode.tekton.dev/max-keep-runs: "5"
+spec:
+  pipelineRef:
+    name: production-container-pipeline
+  params:
+    - name: git-url
+      value: "{{ repo_url }}"          # PaC template variable
+    - name: git-revision
+      value: "{{ revision }}"          # PaC template variable
+    - name: image-name
+      value: "quay.io/myorg/myapp"
+    - name: dockerfile-path
+      value: "./Containerfile"
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 1Gi
+    - name: registry-auth
+      secret:
+        secretName: registry-push-credentials
+    # Uncomment for private repositories — provide a Secret with
+    # .git-credentials or SSH keys for PaC to authenticate to git.
+    # - name: git-auth
+    #   secret:
+    #     secretName: pipelines-as-code-secret
+</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Commands</h3>
+      <div class="cmd-block">
+        <div class="cmd-header">terminal</div>
+        <pre><code class="language-bash"># Apply the full pipeline
+kubectl apply -f 09-production-pipeline.yaml
+
+# Create a PVC for the shared source workspace
+kubectl apply -f - &lt;&lt;EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: production-pipeline-pvc
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+EOF
+
+# Create registry credentials.
+# Key MUST be "config.json" — buildah looks for that exact filename.
+# "kubectl create secret docker-registry" creates ".dockerconfigjson" which
+# buildah cannot find. Use "kubectl create secret generic" instead.
+
+# Option A — reuse existing local Docker / Podman login:
+kubectl create secret generic registry-push-credentials \
+  --from-file=config.json=$HOME/.docker/config.json
+
+# Option B — inline for docker.io (replace USER and TOKEN):
+AUTH=$(echo -n "YOUR_USERNAME:YOUR_TOKEN" | base64)
+kubectl create secret generic registry-push-credentials \
+  --from-literal=config.json="{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$AUTH\"}}}"
+
+# ── Sample repo: traefik/whoami ────────────────────────────────
+# A tiny Go HTTP server with a self-contained two-stage Dockerfile.
+# - Go project  → unit test step (go test ./...) runs successfully
+# - No external pip/npm deps  → fast, reliable build
+# - dockerfile-path overrides the pipeline default (./Containerfile)
+# - git-revision is empty so git-clone uses HEAD of the default branch
+# - git-auth uses emptyDir because the repo is public (no credentials needed)
+# - skip-vuln-scan=true skips Trivy for local dev (remove to enable scanning)
+
+tkn pipeline start production-container-pipeline \
+  --param git-url="https://github.com/traefik/whoami" \
+  --param git-revision="" \
+  --param image-name="docker.io/YOUR_DOCKERHUB_USERNAME/whoami-prod" \
+  --param dockerfile-path="./Dockerfile" \
+  --param skip-tests="false" \
+  --param skip-vuln-scan="true" \
+  --workspace name=source,claimName=production-pipeline-pvc \
+  --workspace name=registry-auth,secret=registry-push-credentials \
+  # --workspace name=git-auth,secret=git-credentials \  # uncomment for private repos
+  --showlog
+
+# View all task logs in sequence as they complete
+tkn pipelinerun logs --last -f
+
+# Debug a specific failed task
+tkn taskrun logs --last -f
+
+# After completion — verify Chains signed the image
+kubectl get taskruns --selector=tekton.dev/pipelineTask=build-container
+# Look for: chains.tekton.dev/signed: "true"
+
+# Install Tekton PaC (Pipeline as Code) for the .tekton/ directory approach
+kubectl apply -f https://raw.githubusercontent.com/openshift-pipelines/pipelines-as-code/stable/release.k8s.yaml</code></pre>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h3>Konflux Connection</h3>
+      <div class="konflux-box">
+        <h4>⚙ How This Applies to Konflux</h4>
+        <p>This pipeline IS the Konflux build pipeline, simplified. The differences in Konflux's version:</p>
+        <ul>
+          <li>Tasks are referenced as <strong>OCI bundle digests</strong> from <code>quay.io/konflux-ci/tekton-catalog</code> — pinned by digest for reproducibility</li>
+          <li>Konflux adds <strong>10+ security tasks</strong>: ecosystem-cert-preflight-checks, clair-scan, sast-snyk-check, clamav-scan, rpms-signature-scan — each runs as a separate pipeline task</li>
+          <li>The <strong>prefetch-dependencies</strong> task (Cachi2) creates a hermetic build environment where all dependencies are pre-fetched — no outbound network access during build</li>
+          <li>The <strong>source-image</strong> task creates an OCI artifact containing the exact source code that was compiled — for full auditability</li>
+          <li>The <code>.tekton/</code> directory you just learned is <strong>how Konflux customizes per-component pipelines</strong> — you can override params, add tasks, and pin to specific task versions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-block takeaways">
+      <h3>Key Takeaways</h3>
+      <ul>
+        <li>This pipeline pattern is the industry standard for container CI</li>
+        <li>Scan AFTER build but BEFORE promoting to production registries</li>
+        <li>SBOM generation runs in parallel with scanning — saves time</li>
+        <li>Pipeline as Code stores pipelines in the application repo</li>
+        <li>Finally block is critical for cleanup and notifications</li>
+        <li>This structure directly maps to Konflux's production pipeline</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+</main>
+</div>
+
+<script>
+// Highlight all code blocks
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('pre code').forEach(function(block) {
+    // Detect language from class or content
+    if (!block.className) {
+      if (block.textContent.includes('apiVersion:')) {
+        block.className = 'language-yaml';
+      } else {
+        block.className = 'language-bash';
+      }
+    }
+    hljs.highlightElement(block);
+  });
+
+  // Sidebar active state on scroll
+  const sections = document.querySelectorAll('.video-section');
+  const navLinks = document.querySelectorAll('.sidebar nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.sidebar nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => observer.observe(s));
+});
+</script>
+</body>
+</html>

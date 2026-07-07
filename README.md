@@ -8,7 +8,7 @@ A practical Tekton reference for engineers building or contributing to Kubernete
 
 ## Architecture
 
-[![Tekton Architecture](https://raw.githubusercontent.com/ay-garg/tekton-field-guide/main/Tekton%20Architecture.png)](https://github.com/ay-garg/tekton-field-guide/blob/main/Tekton%20Architecture.png)
+[![Tekton Architecture](https://raw.githubusercontent.com/ay-garg/tekton-field-guide/refs/heads/main/Tekton-Architecture.png)](https://github.com/ay-garg/tekton-field-guide/blob/main/Tekton-Architecture.png)
 
 ---
 

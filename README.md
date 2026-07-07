@@ -6,6 +6,10 @@ A practical Tekton reference for engineers building or contributing to Kubernete
 
 > Designed for engineers working on or contributing to [Konflux](https://konflux-ci.dev/), though all topics apply to any Tekton installation.
 
+📺 **Video Walkthrough:** Follow along with the [Tekton Field Guide YouTube Playlist](https://www.youtube.com/playlist?list=PLDZzy-6CSJKU) for a step-by-step practical demo of every topic in this repo.
+
+📖 **Blog Post:** For the full conceptual breakdown, read [What Is Tekton? The Kubernetes-Native CI/CD Engine That's Redefining Cloud-Native Pipelines](https://blackhatinside.com/2026/07/07/what-is-tekton-the-kubernetes-native-ci-cd-engine-thats-redefining-cloud-native-pipelines/).
+
 ## Architecture
 
 [![Tekton Architecture](https://raw.githubusercontent.com/ay-garg/tekton-field-guide/refs/heads/main/Tekton-Architecture.png)](https://github.com/ay-garg/tekton-field-guide/blob/main/Tekton-Architecture.png)
